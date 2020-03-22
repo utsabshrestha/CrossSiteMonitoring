@@ -1,0 +1,73 @@
+﻿@model RoadListViewModel
+
+@{
+    ViewBag.Title = "Construction Site Monitoring Dashboard";
+    var sn = 1;
+}
+
+<div class="mb-5"></div>
+
+
+<div class="mb-5">
+    <div class="row">
+        <div class="col-md-auto">
+            <h5>Construction Site Visit</h5>
+        </div>
+        <div class="col-md-3">
+            <form asp-action="ListRoads" method="POST">
+                <select class="custom-select" asp-for="@Model.districtSelected" asp-items="@Model.district_all" onchange="this.form.submit()">
+                    <option value="">Select District</option>
+                </select>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+@if (Model.RoadList.Any())
+{
+<div id="TableBox">
+    <table id="example" class="table table-hover" style="width:100%">
+        <thead>
+            <tr>
+                <th scope="col">SN</th>
+                <th scope="col">Road Code</th>
+                <th scope="col">District</th>
+                <th scope="col">Road Name</th>
+                <th scope="col" style="width: 17%">Last Uploaded Date</th>
+                <th scope="col" style="width: 17%">Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @for (int i = 0; i < Model.RoadList.Count; i++)
+            {
+                <tr>
+                    <th scope="row">@sn</th>
+                    <td>@Model.RoadList[i].road_code</td>
+                    <td>@Model.RoadList[i].district</td>
+                    <td>@Model.RoadList[i].road_name</td>
+                    <td>@Model.RoadList[i].uploadDate.Year-@Model.RoadList[i].uploadDate.Month-@Model.RoadList[i].uploadDate.Day</td>
+                    <td>
+                        <form method="post" asp-action="ListRoadDetail">
+                            <input type="hidden" asp-for="@Model.RoadList[i].road_code" name="road_code" />
+                            <input type="hidden" asp-for="@Model.RoadList[i].uploadDate" name="uploadDate" />
+                            <input type="hidden" asp-for="@Model.RoadList[i].id" name="id" />
+                            <input type="hidden" asp-for="@Model.RoadList[i].road_name" name="road_name" />
+                            <input type="hidden" asp-for="@Model.RoadList[i].district" name="district" />
+                            <button type="submit" class="btn btn-light">View All Visit</button>
+                        </form>
+                    </td>
+                </tr>
+                sn++;
+            }
+        </tbody>
+    </table>
+</div>
+}
+
+
+@section Scripts{
+    <script src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.20/js/dataTables.bootstrap4.min.js"></script>
+    <script src="~/js/DataTableBootstrp.js"></script>
+}

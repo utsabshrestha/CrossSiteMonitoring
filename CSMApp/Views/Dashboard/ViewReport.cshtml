@@ -1,0 +1,52 @@
+﻿@model ReportViewModel
+
+@{ 
+    ViewBag.Title = "Report View Page";
+}
+
+
+    <div class="container">
+        <div class="row mb-4"></div>
+        <div class="row">
+            <div class="col-md-2">
+                <button type="button" class="btn btn-primary">Primary</button>
+                <button type="button" class="btn btn-secondary">Secondary</button>
+            </div>
+            <div class="col-md-8 page">
+                <h3 class="card-title align-items-center text-primary" style="text-align: center">Construction Site Visit Report</h3>
+                <h6 class="card-subtitle mb-2 text-muted" style="text-align: center">@Model.ReportViewDataModel[0].road_name</h6>
+                <table class="table table-borderless">
+                    <tbody>
+                        <tr>
+                            <td>Observer Name : @Model.ReportViewDataModel[0].observer_name</td>
+                            <td style="float: right">Date : @Model.ReportViewDataModel[0].date</td>
+                        </tr>
+                        <tr>
+                            <td>Designation : @Model.ReportViewDataModel[0].designation</td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>District : @Model.ReportViewDataModel[0].district</td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>Road Code : @Model.ReportViewDataModel[0].road_code</td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>Road Name : @Model.ReportViewDataModel[0].road_name</td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>Email : @Model.ReportViewDataModel[0].observer_email</td>
+                            <td></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="col-md-2">
+                <button type="button" class="btn btn-success">Success</button>
+                <button type="button" class="btn btn-danger">Danger</button>
+            </div>
+        </div>
+    </div>

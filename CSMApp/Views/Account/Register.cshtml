@@ -1,0 +1,125 @@
+﻿@model AccountRegisterViewModel
+
+@{
+    ViewData["Title"] = "User Registration";
+    var sn = 1;
+}
+
+<h4>@Model.PageTitle</h4>
+
+<div class="row">
+    <div class="col-md-3">
+        <form method="post">
+            <div asp-validation-summary="All" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="@Model.UserRegistration.observer_name">Observer Name</label>
+                <input asp-for="@Model.UserRegistration.observer_name" class="form-control" placeholder="Observer Name" />
+                <span asp-validation-for="@Model.UserRegistration.observer_name" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="@Model.UserRegistration.user_name">User Name</label>
+                <input asp-for="@Model.UserRegistration.user_name" class="form-control" placeholder="User Name EX : Jhon" />
+                <span asp-validation-for="@Model.UserRegistration.user_name" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="@Model.UserRegistration.Email"></label>
+                <input asp-for="@Model.UserRegistration.Email" class="form-control" placeholder="Email" />
+                <span asp-validation-for="@Model.UserRegistration.Email" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="@Model.UserRegistration.Password"></label>
+                <input asp-for="@Model.UserRegistration.Password" class="form-control" placeholder="Password" />
+                <span asp-validation-for="@Model.UserRegistration.Password" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="@Model.UserRegistration.ConfirmPassword"></label>
+                <input asp-for="@Model.UserRegistration.ConfirmPassword" class="form-control" placeholder="Confirm Password" />
+                <span asp-validation-for="@Model.UserRegistration.ConfirmPassword" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="@Model.UserRegistration.user_type"></label>
+                <select class="form-control" asp-for="@Model.UserRegistration.user_type">
+                    <option value="">Select User Type</option>
+                    <option value="Consultant">Consultant</option>
+                    <option value="road Branch">Road Branch</option>
+                    <option value="Contractor">Contractor</option>
+                    <option value="District Office">District Office</option>
+                </select>
+                <span asp-validation-for="@Model.UserRegistration.user_type" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="@Model.UserRegistration.district"></label>
+                <select class="form-control" asp-for="@Model.UserRegistration.district" asp-items="Model.district_all">
+                    <option value="">Select District</option>
+                </select>
+                <span asp-validation-for="@Model.UserRegistration.district" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="@Model.UserRegistration.in_maintenance"></label>
+                <input type="number" asp-for="@Model.UserRegistration.in_maintenance" class="form-control" placeholder="Roads In Maintenance" />
+                <span asp-validation-for="@Model.UserRegistration.in_maintenance" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="@Model.UserRegistration.organization"></label>
+                <input asp-for="@Model.UserRegistration.organization" class="form-control" />
+                <span asp-validation-for="@Model.UserRegistration.organization" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="@Model.UserRegistration.designation"></label>
+                <input asp-for="@Model.UserRegistration.designation" class="form-control" />
+                <span asp-validation-for="@Model.UserRegistration.designation" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input asp-for="@Model.UserRegistration.is_ranked_user" class="form-check-input" />
+                <label asp-for="@Model.UserRegistration.is_ranked_user"></label>
+            </div>
+            <button type="submit" class="btn btn-primary">Register</button>
+        </form>
+    </div>
+
+    <div class="col-md-9">
+        <table id="example" class="table  table-hover table-sm">
+            <thead>
+                <tr>
+                    <th scope="col">Sn</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">Email</th>
+                    <th scope="col">District</th>
+                    <th scope="col">Organization</th>
+                    <th scope="col">Designation</th>
+                    <th scope="col">Status</th>
+                    <th scope="col" style="width:15%">Date</th>
+                    <th scope="col">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+
+                @foreach (ApplicationUser user in Model.User)
+                {
+                    <tr>
+                        <td scope="row">@sn</td>
+                        <td>@user.observer_name</td>
+                        <td>@user.Email</td>
+                        <td>@user.district</td>
+                        <td>@user.organization</td>
+                        <td>@user.designation</td>
+                        <td>@user.status</td>
+                        <td>@user.date.Year-@user.date.Month-@user.date.Day</td>
+                        <td>
+                            <a asp-action="EditUser" asp-controller="Administration" asp-route-id="@user.Id" class="btn btn-sm btn-outline-info">EditUser</a>
+                        </td>
+                    </tr>
+                    sn++;
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+@section Scripts{
+    <script src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.20/js/dataTables.bootstrap4.min.js"></script>
+    <script src="~/js/DataTableBootstrp.js"></script>
+    @*<script src="https://gitcdn.github.io/bootstrap-toggle/2.2.2/js/bootstrap-toggle.min.js"></script>*@
+}

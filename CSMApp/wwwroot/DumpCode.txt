@@ -1,0 +1,122 @@
+﻿
+
+
+var construction = from c in context.ConstructionObservationDetails
+                    group c by c.initials_id into g
+                    select new
+                    {
+                        initials_id = g.Key
+                    };
+
+var roadDetail = (from i in context.InitialsDetails
+                    join c in construction
+                    on i.ini_id equals c.initials_id
+                    group i by i.road_code into g
+                    orderby g.Max(x => x.uploaded_date) descending
+                    select new RoadList
+                    {
+                        id = g.Max(x => x.ini_id),
+                        road_code = g.Key,
+                        road_name = g.Max(x => x.road_name),
+                        district = g.Max(x => x.district),
+                        date = g.Max(x => x.date),
+                        uploadDate = g.Max(x => x.uploaded_date)
+                    }).ToList();
+
+
+roadDetail = (from i in context.InitialsDetails
+                join c in context.ConstructionObservationDetails
+                on i.ini_id equals c.initials_id
+                join f in context.Files
+                on c.form_id equals f.form_id into ljfile
+                from lj in ljfile.DefaultIfEmpty()
+                join u in userManager.Users
+                on i.observer_email equals u.Email
+                where i.road_code == model.road_code
+                orderby i.ini_id descending
+                select new DetailRoadList
+                {
+                    ini_id = i.ini_id,
+                    roadCode = i.road_code,
+                    district = i.district,
+                    date = i.date,
+                    uploadDate = i.uploaded_date,
+                    observerName = u.observer_name,
+                    userName = u.UserName,
+                    observerEmail = i.observer_email,
+                    designation = u.designation,
+                    reportStatus = i.report_status,
+                    roadName = i.road_name ?? model.road_name
+                }).ToList();
+
+
+   var rcode = Request.Form["road_code"];
+
+
+var roads = (from r in roaddetails
+            select new RoadList
+            {
+                id = r.id,
+                road_code = r.road_code,
+                road_name = r.road_name,
+                district = r.district,
+                date = r.date,
+                uploadDate = r.uploadDate
+            }).ToList();
+
+
+
+roadDetail = (from rd in roaddetails
+        select new DetailRoadList
+        {
+            ini_id = rd.ini_id,
+            roadCode = rd.roadCode,
+            roadName = rd.roadName,
+            district = rd.district,
+            date = rd.date,
+            uploadDate = rd.uploadDate,
+            observerName = rd.observerName,
+            observerEmail = rd.observerEmail,
+            userName = rd.userName,
+            designation = rd.designation,
+            reportStatus = rd.reportStatus
+        }).ToList();
+
+
+public async Task<IActionResult> usercreate()
+{
+var user = (from u in context.userRegs
+select new UserReg
+{
+user_id = u.user_id,
+observer_name = u.observer_name,
+designation = u.designation,
+organization = u.organization,
+email = u.email,
+user_type = u.user_type,
+district = u.district
+}).Take(100).ToList();
+
+ApplicationUser users = null;
+
+foreach (var u in user)
+{
+users = new ApplicationUser
+{
+UserName = u.email,
+Email = u.email,
+observer_name = u.observer_name,
+designation = u.designation,
+organization = u.organization,
+user_type = u.user_type,
+district = u.district,
+is_ranked_user = true,
+status = true,
+date = DateTime.Now,
+in_maintenance = 1
+};
+
+await userManager.CreateAsync(users, "Pwd12345.");
+}
+return View();
+}

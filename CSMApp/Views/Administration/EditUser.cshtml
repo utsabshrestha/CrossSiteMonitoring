@@ -1,0 +1,171 @@
+﻿@model EditUserViewModel
+
+@{
+    ViewBag.TItle = "Edti user";
+}
+
+<h2>Edit User</h2>
+
+<form method="post">
+    <div asp-validation-summary="All" class="text-danger"></div>
+    <div class="form-group">
+        <label asp-for="@Model.date">Created On</label>
+        <input disabled asp-for="@Model.date" value="@Model.date" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label asp-for="@Model.ObserverName">Observer Name</label>
+        <input asp-for="@Model.ObserverName" class="form-control" placeholder="Observer Name" />
+        <span asp-validation-for="@Model.ObserverName" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="@Model.UserName">User Name</label>
+        <input asp-for="@Model.UserName" class="form-control" placeholder="User Name EX : Jhon" />
+        <span asp-validation-for="@Model.UserName" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="@Model.Email"></label>
+        <input asp-for="@Model.Email" class="form-control" placeholder="Email" />
+        <span asp-validation-for="@Model.Email" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="@Model.user_type"></label>
+        <select class="form-control" asp-for="@Model.user_type">
+            @foreach (string type in new List<string>() { "Consultant", "Road Branch", "Contractor", "District Office" })
+            {
+                if (type == Model.user_type)
+                {
+                    <option selected value="@type">@type</option>
+                }
+                else
+                {
+                    <option value="@type">@type</option>
+                }
+            }
+
+        </select>
+        <span asp-validation-for="@Model.user_type" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="@Model.district"></label>
+        <select class="form-control" asp-for="@Model.district" asp-items="Model.district_all">
+            <option value="">Select District</option>
+   
+        </select>
+        <span asp-validation-for="@Model.district" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="@Model.in_maintenance"></label>
+        <input type="number" asp-for="@Model.in_maintenance" class="form-control" placeholder="Roads In Maintenance" />
+        <span asp-validation-for="@Model.in_maintenance" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="@Model.organization"></label>
+        <input asp-for="@Model.organization" class="form-control" />
+        <span asp-validation-for="@Model.organization" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="@Model.designation"></label>
+        <input asp-for="@Model.designation" class="form-control" />
+        <span asp-validation-for="@Model.designation" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <input asp-for="@Model.is_ranked_user" class="form-check-input" />
+        <label asp-for="@Model.is_ranked_user"></label>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="@Model.status"></label>
+        <select class="form-control" asp-for="@Model.status">
+            <option value="">Select Status</option>
+
+            @foreach (var stat in new List<string> { "TRUE", "FALSE" })
+            {
+                if (stat == Model.status.ToString())
+                {
+                    <option selected value="@stat">
+                        @if (stat == "TRUE")
+                        {
+                            <text>Active</text>
+                        }
+                        else
+                        {
+                            <text>InActive</text>
+                        }
+                    </option>
+                }
+                else
+                {
+                    <option value="@stat">
+                        @if (stat == "TRUE")
+                        {
+                            <text>Active</text>
+                        }
+                        else
+                        {
+                            <text>InActive</text>
+                        }
+                    </option>
+                }
+            }
+        </select>
+    </div>
+
+
+    <div class="form-group row">
+        <div class="col-sm-10">
+            <button type="submit" class="btn btn-primary">Update</button>
+            <a asp-action="ListUsers" class="btn btn-primary">Cancel</a>
+        </div>
+    </div>
+
+
+    <div class="card">
+        <div class="card-header">
+            <h3>User Roles</h3>
+        </div>
+        <div class="card-body">
+            @if (Model.Roles.Any())
+            {
+                foreach (var role in Model.Roles)
+                {
+                    <h5 class="card-title">@role</h5>
+                }
+            }
+            else
+            {
+                <h5 class="card-title">None at the moment</h5>
+            }
+        </div>
+        <div class="card-footer">
+            <a asp-action="ManageUserRoles" asp-route-userId="@Model.Id" class="btn btn-primary">Manage Roles</a>
+        </div>
+    </div>
+
+    <div class="card mt-3">
+        <div class="card-header">
+            <h3>User Claims</h3>
+        </div>
+        <div class="card-body">
+            @if (Model.Claims.Any())
+            {
+                foreach (var claim in Model.Claims)
+                {
+                    <h5 class="card-title">@claim</h5>
+                }
+            }
+            else
+            {
+                <h5 class="card-title">None at the moment</h5>
+            }
+        </div>
+        <div class="card-footer">
+            <a style="width:auto" class="btn btn-primary" asp-action="ManageUserClaims" asp-route-userId="@Model.Id">
+                Manage Claims
+            </a>
+        </div>
+    </div>
+</form>
+
+@section Scripts{
+    <script src="https://gitcdn.github.io/bootstrap-toggle/2.2.2/js/bootstrap-toggle.min.js"></script>
+}
