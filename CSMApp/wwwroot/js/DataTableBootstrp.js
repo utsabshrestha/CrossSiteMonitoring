@@ -1,6 +1,0 @@
-﻿$(document).ready(function () {
-    $('#example').dataTable({
-        "iDisplayLength": 10,
-        "aLengthMenu": [[5, 10, 25, 50, 100, -1], [5, 10, 25, 50, 100, "All"]]
-    });
-});

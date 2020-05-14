@@ -1,0 +1,207 @@
+﻿@model ReportViewModel
+
+@{
+    ViewBag.Title = "Report View Page";
+    var R = 1;
+}
+
+@*@Context.Request.Host @Context.Request.Path @Context.Request.Scheme*@
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-2 pt-5">
+            <div class="list-group list-group-flush sticky-top" style="top: 90px;">
+                <form action="ListRoadDetail" method="post" class="mb-2 list-group-item">
+                    <input asp-for="@Model.ReportData[0].road_code" name="road_code" type="hidden" />
+                    <input asp-for="@Model.ReportData[0].district" name="district" type="hidden" />
+                    <button type="submit" class="btn btn-sm styleMy">Go Back</button>
+                </form>
+                <form action="ListRoads" method="post" class="mb-2 list-group-item">
+                    <input asp-for="@Model.ReportData[0].district" name="districtSelected" type="hidden" />
+                    <button type="submit" class="btn btn-sm styleMy">Site Visit @Model.ReportData[0].district</button>
+                </form>
+            </div>
+        </div>
+        <div class="col-md-8 page">
+            <h3 class="card-title align-items-center text-primary text-center">Construction Site Visit Report</h3>
+            <h6 class="card-subtitle text-muted text-center">@Model.ReportData[0].road_name</h6>
+
+            <table class="table table-borderless mb-4 mt-3" id="introduction">
+                <tbody>
+                    <tr>
+                        <td>Observer Name : @Model.ReportData[0].observer_name</td>
+                        <td style="float: right">Date : @Model.ReportData[0].date.Year - @Model.ReportData[0].date.Month - @Model.ReportData[0].date.Day</td>
+                    </tr>
+                    <tr>
+                        <td>Designation : @Model.ReportData[0].designation</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>District : @Model.ReportData[0].district</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>Road Code : @Model.ReportData[0].road_code</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>Road Name : @Model.ReportData[0].road_name</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>Email : @Model.ReportData[0].observer_email</td>
+                        <td></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            @foreach (var report in Model.ReportData)
+            {
+                <div class="card-title styleMy"> Observation @R </div>
+                <div class="dropdown-divider  mb-4"></div>
+
+                if (!string.IsNullOrEmpty(report.file_name))
+                {
+                    <img style="width: 90%" id="img-@R" class="img-fluid" alt="Responsive image" src="~/Mapping/352217080998341_1584080101616_map.png" />
+                }
+
+                <div class="card-title mt-3 mb-2">Map Location</div>
+
+                <table class="table table-borderless" id="table-num-@R">
+                    <tbody>
+                        <tr>
+                            <td>Observation Type</td>
+                            <td>@report.construction_type</td>
+                        </tr>
+                        <tr>
+                            <td>Location Type</td>
+                            <td>@report.location_type</td>
+                        </tr>
+                        @if (!string.IsNullOrEmpty(report.observation_notes))
+                        {
+                            <tr>
+                                <td>Observation Notes</td>
+                                <td>@report.observation_notes</td>
+                            </tr>
+                        }
+                        <tr>
+                            <td>Observation Rating</td>
+                            <td>@report.quality_rating</td>
+                        </tr>
+                        <tr>
+                            <td>Co-ordinates Point (Lat>lon) </td>
+                            <td>@report.latitude , @report.longitude</td>
+                        </tr>
+                        <tr>
+                            <td>Elevation</td>
+                            <td>@report.altitude</td>
+                        </tr>
+                    </tbody>
+                </table>
+                R++;
+            }
+
+        </div>
+        <div class="col-md-2 pt-5">
+            <div class="list-group list-group-flush sticky-top" style="top: 90px;">
+                <div class="mb-2 list-group-item">
+                    <button class="btn btn-sm styleMy" onclick="CreatePdF()">Print PDF </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@*<a href="javascript:CreatePdF()" class="button">Run Code</a>*@
+
+@section Scripts{
+
+    @*<script src="https://unpkg.com/jspdf@1.5.3/dist/jspdf.min.js"></script>*@
+    @*<script src="https://unpkg.com/jspdf-autotable@3.5.3/dist/jspdf.plugin.autotable.js"></script>*@
+
+    <script src="~/js/jspdf.min.js"></script>
+    <script src="~/js/jspdf.plugin.autotable.js"></script>
+    <script type="text/javascript">
+
+        function CreatePdF()
+        {
+            let options = {
+                orientation: 'p',
+                unit: 'mm',
+                format: 'a4',
+                putOnlyUsedFonts: true,
+                floatPrecision: 16 // or "smart", default is 16
+            };
+
+            var doc = new jsPDF(options);
+            doc.setTextColor(0, 0, 255);
+            doc.setFont("times");
+            doc.setFontStyle("normal");
+            doc.text("Construction Site Visit Report", 105, 20, null, null, "center");
+            doc.setTextColor(100);
+            doc.text("@Model.ReportData[0].road_name", 105, 30, null, null, "center");
+            doc.autoTable({ html: "#introduction",startY: 40 });
+            let tablePos = doc.previousAutoTable.finalY;
+            let numObserv = @Model.ReportData.Count;
+            let curObserv = 1;
+            let temp;
+            let imgsrc;
+
+            while (curObserv <= numObserv) {
+
+                temp = "#table-num-" + curObserv;
+
+                if (curObserv == 1) {
+                    doc.text("Observation " + curObserv, 15, tablePos + 10);
+                    doc.addImage(document.getElementById("img-" + curObserv), 'PNG', 15, tablePos + 15, 180, 110);
+                    doc.autoTable({ html: temp, startY: tablePos + 140 });
+                } else {
+                    doc.text("Observation " + curObserv, 15, 20);
+                    doc.addImage(document.getElementById("img-" + curObserv), 'PNG', 15, 30, 180, 110);
+                    doc.autoTable({ html: temp, startY: 160 });
+                }
+                if (curObserv < numObserv) {
+                    doc.addPage();
+                }
+                curObserv++;
+            }
+            let fname = "@Model.ReportData[0].road_name" + "_" + "@Model.ReportData[0].date.Year " + "_" + "@Model.ReportData[0].date.Month" + "_" + "@Model.ReportData[0].date.Day";
+
+            doc.save( fname + '.pdf');
+        }
+
+        //not used
+        async function LoadImageUri(url) {
+            let promise = new Promise((resolve) => {
+                let img = new Image();
+                img.onload = () => resolve(img);
+                img.src = url;
+            });
+            let result = await promise;
+            return result;
+        }
+
+        //not used
+        function getDataUri(url, callback) {
+            var image = new Image();
+
+            image.onload = function () {
+                var canvas = document.createElement('canvas');
+                canvas.width = this.naturalWidth; // or 'width' if you want a special/scaled size
+                canvas.height = this.naturalHeight; // or 'height' if you want a special/scaled size
+
+                canvas.getContext('2d').drawImage(this, 0, 0);
+
+                // Get raw image data
+                callback(canvas.toDataURL('image/png').replace(/^data:image\/(png|jpg);base64,/, ''));
+
+                // ... or get as Data URI
+                //callback(canvas.toDataURL('image/png'));
+            };
+
+            image.src = url;
+        }
+
+    </script>
+
+}

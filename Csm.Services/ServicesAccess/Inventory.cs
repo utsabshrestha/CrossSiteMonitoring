@@ -1,11 +1,11 @@
-﻿using DataAccessLibrary.DataAccessLayer.DataAccess;
+﻿using Csm.Services.ServiceInterface;
+using DataAccessLibrary.DataAccessLayer.DataAccess;
 using DataAccessLibrary.Models;
-using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace DataAccessLibrary.DataAccess
+namespace Csm.Services.ServicesAccess
 {
     public class Inventory : IInventory
     {
@@ -37,7 +37,7 @@ namespace DataAccessLibrary.DataAccess
 
             return output;
         }
-        
+
         public List<Road> GetRoads(string district)
         {
             string query = @"select max(id.ini_id)as id,id.road_code,max(id.road_name) as road_name,max(id.district) as district,max(id.date) as date,
@@ -96,7 +96,7 @@ namespace DataAccessLibrary.DataAccess
                             join(select * from monitoring.user_registration)ur on ur.email=id.observer_email
                             where id.road_code = @RoadCode and id.date = @Date and id.observer_email like @Email order by cod.cons_id";
 
-            var parameters = new 
+            var parameters = new
             {
                 RoadCode = roadeCode,
                 Date = date,

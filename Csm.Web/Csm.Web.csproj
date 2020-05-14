@@ -1,0 +1,50 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <UserSecretsId>aspnet-Csm.Web-60296FA5-098B-4B0B-A185-80AA7D7E1D2E</UserSecretsId>
+    <RootNamespace>Csm.Web</RootNamespace>
+    <AssemblyName>Csm.Web</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Controllers\TokenController.cs" />
+    <Compile Remove="Migrations\20200318075049_UserTableNameEdit.cs" />
+    <Compile Remove="Migrations\20200318075049_UserTableNameEdit.Designer.cs" />
+    <Compile Remove="Migrations\20200318090429_UserTableEdit.cs" />
+    <Compile Remove="Migrations\20200318090429_UserTableEdit.Designer.cs" />
+    <Compile Remove="Migrations\20200318092047_RegistrationUserEdit.cs" />
+    <Compile Remove="Migrations\20200318092047_RegistrationUserEdit.Designer.cs" />
+    <Compile Remove="Migrations\20200318092211_UserRegEdit.cs" />
+    <Compile Remove="Migrations\20200318092211_UserRegEdit.Designer.cs" />
+  </ItemGroup>
+
+
+  <ItemGroup>
+    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="7.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="3.1.2" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="3.1.2" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="3.1.2" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="3.1.2" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.1.2" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="3.1.2">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.1.1" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="3.1.2" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL.Design" Version="1.1.0" />
+    <PackageReference Include="PDFsharp-MigraDoc-GDI" Version="1.50.5147" />
+    <PackageReference Include="System.Text.Encoding.CodePages" Version="4.7.0" /> 
+  </ItemGroup>
+
+
+  <ItemGroup>
+    <Folder Include="wwwroot\Mapping\" />
+  </ItemGroup>
+
+
+  <ItemGroup>
+    <ProjectReference Include="..\Csm.Services\Csm.Services.csproj" />
+  </ItemGroup>
+</Project>
