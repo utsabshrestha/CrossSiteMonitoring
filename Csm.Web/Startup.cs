@@ -19,6 +19,7 @@ using AutoMapper;
 using DataAccessLibrary.DataAccessLayer.DataAccess;
 using Csm.Services.ServiceInterface;
 using Csm.Services.ServicesAccess;
+using DataAccessLibrary.DataAccessLayer.Interfaces;
 
 namespace Csm.Web
 {
@@ -46,12 +47,17 @@ namespace Csm.Web
             })
                 .AddEntityFrameworkStores<ApplicationDbContext>();
 
-            //personam DI
+            //DI services and dal
             services.AddTransient<IInventory, Inventory>();
             services.AddTransient<ISqlDataAccess, SqlDataAccess>();
+            services.AddTransient<ISqlLiteDataAccess, SqlLiteDataAccess>();
+            services.AddTransient<ISyncApi, SyncApi>();
 
             //AutoMapper
             services.AddAutoMapper(typeof(Startup));
+
+            //HttpClient
+            //services.AddHttpClient();
 
             services.AddControllersWithViews();
             services.AddRazorPages()
@@ -119,7 +125,3 @@ namespace Csm.Web
         }
     }
 }
-
-//services.AddDbContext<ApplicationDbContext>(options =>
-//    options.UseSqlServer(
-//        Configuration.GetConnectionString("DefaultConnection")));

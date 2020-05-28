@@ -1,9 +1,10 @@
 ﻿using Csm.Services.ServiceInterface;
-using DataAccessLibrary.DataAccessLayer.DataAccess;
+using DataAccessLibrary.DataAccessLayer.Interfaces;
 using DataAccessLibrary.Models;
 using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Csm.Services.ServicesAccess
 {
@@ -16,29 +17,28 @@ namespace Csm.Services.ServicesAccess
             this.sqlDataAccess = sqlDataAccess;
         }
 
-        public List<District> GetDistricts()
+        public async Task<IEnumerable<District>> GetDistricts()
         {
             string query = @"select id, district_name, dcode from monitoring.tbl_district order by district_name asc;";
 
-            var output = sqlDataAccess.LoadData<District, dynamic>(query, new { }, "Csmdb");
+            var output = await sqlDataAccess.LoadData<District, dynamic>(query, new { }, "Csmdb");
 
             return output;
         }
 
-
-        public List<Road> GetRoads()
+        public async Task<IEnumerable<Road>> GetRoads()
         {
             string query = @"select max(id.ini_id)as id,id.road_code,max(id.road_name) as road_name,max(id.district) as district,max(id.date) as date,
                             max(id.uploaded_date) as uploaded_date from monitoring.initial_details id
                             join(select initials_id from monitoring.construction_observation_detail group by initials_id)cod on cod.initials_id=id.ini_id
                             group by id.road_code order by uploaded_date DESC;";
 
-            var output = sqlDataAccess.LoadData<Road, dynamic>(query, new { }, "Csmdb");
+            var output = await sqlDataAccess.LoadData<Road, dynamic>(query, new { }, "Csmdb");
 
             return output;
         }
 
-        public List<Road> GetRoads(string district)
+        public async Task<IEnumerable<Road>> GetRoads(string district)
         {
             string query = @"select max(id.ini_id)as id,id.road_code,max(id.road_name) as road_name,max(id.district) as district,max(id.date) as date,
                             max(id.uploaded_date) as uploaded_date from monitoring.initial_details id
@@ -46,12 +46,12 @@ namespace Csm.Services.ServicesAccess
                             where id.district = @District
                             group by id.road_code order by uploaded_date DESC;";
 
-            var output = sqlDataAccess.LoadData<Road, dynamic>(query, new { District = district }, "Csmdb");
+            var output = await sqlDataAccess.LoadData<Road, dynamic>(query, new { District = district }, "Csmdb");
 
             return output;
         }
 
-        public List<RoadDetails> GetRoadDetails(string roadCode)
+        public async Task<IEnumerable<RoadDetails>> GetRoadDetails(string roadCode)
         {
             string query = @"select id.ini_id,id.road_code,id.road_name,id.district,id.date,id.uploaded_date,ur.observer_name,id.observer_email,
                             ur.designation,id.report_status from monitoring.initial_details id
@@ -60,12 +60,12 @@ namespace Csm.Services.ServicesAccess
                             join(select * from public.user_registration)ur on ur.email=id.observer_email
                             where id.road_code = @RoadCode order by id.ini_id DESC;";
 
-            var output = sqlDataAccess.LoadData<RoadDetails, dynamic>(query, new { RoadCode = roadCode }, "Csmdb");
+            var output = await sqlDataAccess.LoadData<RoadDetails, dynamic>(query, new { RoadCode = roadCode }, "Csmdb");
             return output;
 
         }
 
-        public List<RoadDetails> GetRoadDetails(string roadCode, string district)
+        public async Task<IEnumerable<RoadDetails>> GetRoadDetails(string roadCode, string district)
         {
             string query = @"select id.ini_id,id.road_code,id.road_name,id.district,id.date,id.uploaded_date,ur.observer_name,id.observer_email,
                             ur.designation,id.report_status from monitoring.initial_details id
@@ -80,12 +80,12 @@ namespace Csm.Services.ServicesAccess
                 District = district
             };
 
-            var output = sqlDataAccess.LoadData<RoadDetails, dynamic>(query, parameters, "Csmdb");
+            var output = await sqlDataAccess.LoadData<RoadDetails, dynamic>(query, parameters, "Csmdb");
             return output;
 
         }
 
-        public List<ReportDataModel> GetReportDataList(string roadeCode, DateTime date, string observerEmail)
+        public async Task<IEnumerable<ReportDataModel>> GetReportDataList(string roadeCode, DateTime date, string observerEmail)
         {
             string query = @"select id.ini_id,id.road_code,id.road_name,id.district,id.date,ur.observer_name,id.observer_email,ur.designation,cod.cons_id,
                             cod.form_id,cod.construction_type,cod.location_type,cod.location,cod.observation_notes,cod.quality_rating,cod.latitude,
@@ -103,7 +103,7 @@ namespace Csm.Services.ServicesAccess
                 Email = observerEmail
             };
 
-            var output = sqlDataAccess.LoadData<ReportDataModel, dynamic>(query, parameters, "Csmdb");
+            var output = await sqlDataAccess.LoadData<ReportDataModel, dynamic>(query, parameters, "Csmdb");
             return output;
         }
     }

@@ -1,10 +1,9 @@
 ﻿using DataAccessLibrary.Models;
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
-namespace Csm.Services.ServiceInterface
+namespace DataAccessLibrary.DataAccess
 {
     public interface IInventory
     {
@@ -16,4 +15,3 @@ namespace Csm.Services.ServiceInterface
         Task<IEnumerable<ReportDataModel>> GetReportDataList(string roadeCode, DateTime date, string observerEmail);
     }
 }
-        

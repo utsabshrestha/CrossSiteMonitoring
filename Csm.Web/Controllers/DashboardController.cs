@@ -2,19 +2,20 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Dynamic;
+using System.IO;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using AutoMapper;
 using Csm.Services.ServiceInterface;
 using Csm.Web.Models;
 using Csm.Web.ViewModels;
 using DataAccessLibrary.Models;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using MigraDoc.DocumentObjectModel;
-using MigraDoc.Rendering;
-using PdfSharp.Pdf;
+
 
 namespace Csm.Web.Controllers
 {
@@ -23,20 +24,22 @@ namespace Csm.Web.Controllers
         private readonly UserManager<ApplicationUser> userManager;
         private readonly IInventory inventory;
         private readonly IMapper mapper;
+        private readonly ISyncApi syncApi;
 
-        public DashboardController(UserManager<ApplicationUser> userManager, IInventory inventory, IMapper mapper)
+        public DashboardController(UserManager<ApplicationUser> userManager, IInventory inventory, IMapper mapper, ISyncApi syncApi)
         {
             this.userManager = userManager;
             this.inventory = inventory;
             this.mapper = mapper;
+            this.syncApi = syncApi;
         }
 
 
         [HttpGet]
-        public IActionResult ListRoads()
+        public async Task<IActionResult> ListRoads()
         {
-            var roaddetails = inventory.GetRoads();
-            var districts = inventory.GetDistricts();
+            var roaddetails = await inventory.GetRoads();
+            var districts = await inventory.GetDistricts();
             var districtItems = (from dis in districts select new SelectListItem  { Value = dis.district_name, Text = dis.district_name }).ToList();
 
             //List<RoadList> roadlists = new List<RoadList>();
@@ -49,22 +52,22 @@ namespace Csm.Web.Controllers
             var model = new RoadListViewModel
             {
                 district_all = districtItems,
-                RoadList = roaddetails
+                RoadList = roaddetails.ToList()
             };
 
             return View(model);
         } 
         
         [HttpPost]
-        public IActionResult ListRoads(string districtSelected)
+        public async Task<IActionResult> ListRoads(string districtSelected)
         {
             if (String.IsNullOrEmpty(districtSelected))
             {
                 return RedirectToAction("ListRoads");
             }
 
-            var roaddetails = inventory.GetRoads(districtSelected);
-            var districts = inventory.GetDistricts();
+            var roaddetails = await inventory.GetRoads(districtSelected);
+            var districts = await inventory.GetDistricts();
 
             var districtItems = (from dis in districts select new SelectListItem { Value = dis.district_name, Text = dis.district_name }).ToList();
 
@@ -79,25 +82,25 @@ namespace Csm.Web.Controllers
             {
                 districtSelected = districtSelected,
                 district_all = districtItems,
-                RoadList = roaddetails
+                RoadList = roaddetails.ToList()
             };
 
             return View(model);
         }
 
         [HttpPost]
-        public IActionResult ListRoadDetail(RoadList model)
+        public async Task<IActionResult> ListRoadDetail(RoadList model)
         {
             List<DetailRoadList> roadDetail = new List<DetailRoadList>();
-            List<RoadDetails> roaddetails = null;
+            IEnumerable<RoadDetails> roaddetails = null;
 
             if (string.IsNullOrEmpty(model.district))
             {
-                 roaddetails = inventory.GetRoadDetails(model.road_code);
+                 roaddetails = await inventory.GetRoadDetails(model.road_code);
             }
             else
             {
-                 roaddetails = inventory.GetRoadDetails(model.road_code, model.district);
+                 roaddetails = await inventory.GetRoadDetails(model.road_code, model.district);
             }
 
 
@@ -110,10 +113,10 @@ namespace Csm.Web.Controllers
         }
 
         [HttpPost]
-        public IActionResult ViewReport(string road_code, DateTime date, string observer_email)
+        public async Task<IActionResult> ViewReport(string road_code, DateTime date, string observer_email)
         {
-            List<ReportDataModel> reportList = inventory.GetReportDataList(road_code, date, observer_email);
-            List<ReportModel> reportViewModel = new List<ReportModel>();
+            IEnumerable<ReportDataModel> reportList = await inventory.GetReportDataList(road_code, date, observer_email);
+            IList<ReportModel> reportViewModel = new List<ReportModel>();
 
             foreach(var roadData in reportList)
             {
@@ -126,29 +129,10 @@ namespace Csm.Web.Controllers
         }
 
         [HttpGet]
-        [Obsolete]
-        public void PdfGen()
+        public IActionResult test() 
         {
-            Document document = new Document();
-            Section section = document.AddSection();
-            section.AddParagraph("Hello, this is PDF genereated with MigraDoc in .Net Core");
-            section.AddParagraph();
-
-            Paragraph paragraph = section.AddParagraph();
-            paragraph.Format.Font.Color = Color.FromCmyk(100, 30, 20, 50);
-            paragraph.AddFormattedText("Hello, World!", TextFormat.Underline);
-
-            FormattedText ft = paragraph.AddFormattedText("Small text", TextFormat.Bold);
-            ft.Font.Size = 6;
-
-            PdfDocumentRenderer pdfRenderer = new PdfDocumentRenderer(false, PdfFontEmbedding.Always);
-
-
-            pdfRenderer.Document = document;
-            pdfRenderer.RenderDocument();
-            string filename = "HelloWorld.pdf";
-            pdfRenderer.PdfDocument.Save(filename);
+            syncApi.Inst();
+            return Ok();
         }
-
     }
 }

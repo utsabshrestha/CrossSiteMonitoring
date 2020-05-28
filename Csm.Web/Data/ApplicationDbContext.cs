@@ -26,7 +26,7 @@ namespace Csm.Web.Data
                 foreignKey.DeleteBehavior = DeleteBehavior.Restrict;
             }
 
-            //haha lol take a heck of tria and error to changing name for aspuser table
+            //haha lol take a heck of trial and error to changing name for aspuser table
             builder.Entity<ApplicationUser>(
             b =>
             {

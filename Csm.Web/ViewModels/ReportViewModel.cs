@@ -12,6 +12,6 @@ namespace Csm.Web.ViewModels
         {
             ReportData = new List<ReportModel>();
         }
-        public List<ReportModel> ReportData { get; set; }
+        public IList<ReportModel> ReportData { get; set; }
     }
 }

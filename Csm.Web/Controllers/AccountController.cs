@@ -39,9 +39,9 @@ namespace Csm.Web.Controllers
 
         [HttpGet]
         //[Authorize]
-        public IActionResult Register()
+        public async Task<IActionResult> Register()
         {
-            var getDistrict = inventory.GetDistricts();
+            var getDistrict = await inventory.GetDistricts();
 
             var district = (from dist in getDistrict
                             select new SelectListItem
@@ -100,7 +100,7 @@ namespace Csm.Web.Controllers
                 }
             }
 
-            var getDistrict = inventory.GetDistricts();
+            var getDistrict = await inventory.GetDistricts();
 
             ViewModel.district_all = (from dist in getDistrict
                                       select new SelectListItem

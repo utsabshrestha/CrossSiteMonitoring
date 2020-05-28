@@ -132,7 +132,7 @@ namespace Csm.Web.Controllers
             // GetRolesAsync returns the list of user Roles
             var userRoles = await userManager.GetRolesAsync(user);
 
-            var getDistrict = inventory.GetDistricts();
+            var getDistrict = await inventory.GetDistricts();
 
             var district = (from dist in getDistrict
                             select new SelectListItem { Value = dist.district_name, Text = dist.district_name }).ToList();
