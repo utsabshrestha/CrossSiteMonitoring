@@ -9,6 +9,5 @@ namespace Csm.Services.ServiceInterface
     public interface ISyncApi
     {
         Task<SyncStatus> SyncData(SyncApiCred apiCred);
-        void Inst();
     }
 }

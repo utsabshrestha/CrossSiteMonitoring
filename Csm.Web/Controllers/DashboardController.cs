@@ -131,7 +131,6 @@ namespace Csm.Web.Controllers
         [HttpGet]
         public IActionResult test() 
         {
-            syncApi.Inst();
             return Ok();
         }
     }

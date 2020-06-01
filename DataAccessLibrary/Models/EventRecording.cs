@@ -9,7 +9,7 @@ namespace DataAccessLibrary.Models
         public string uuid { get; set; }
         public string district { get; set; }
         public string road_link { get; set; }
-        public string road_name { get; set; }
+        public string river_name { get; set; }
         public Double latitude { get; set; }
         public Double longitude { get; set; }
         public string division { get; set; }

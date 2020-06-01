@@ -87,8 +87,8 @@
                     <th scope="col">District</th>
                     <th scope="col">Organization</th>
                     <th scope="col">Designation</th>
-                    <th scope="col">Status</th>
-                    <th scope="col" style="width:15%">Date</th>
+                    @*<th scope="col">Status</th>
+                    <th scope="col" style="width:15%">Date</th>*@
                     <th scope="col">Action</th>
                 </tr>
             </thead>
@@ -103,8 +103,8 @@
                         <td>@user.district</td>
                         <td>@user.organization</td>
                         <td>@user.designation</td>
-                        <td>@user.status</td>
-                        <td>@user.date.Year-@user.date.Month-@user.date.Day</td>
+                        @*<td>@user.status</td>
+                        <td>@user.date.Year-@user.date.Month-@user.date.Day</td>*@
                         <td>
                             <a asp-action="EditUser" asp-controller="Administration" asp-route-id="@user.Id" class="btn btn-sm btn-outline-info">EditUser</a>
                         </td>

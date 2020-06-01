@@ -57,64 +57,15 @@ namespace Csm.Services.ServicesAccess
             return status;
         }
 
-
-        public void Inst()
-        {
-            List<dynamic> id = new List<dynamic> {
-            new {
-                date =System.DateTime.Now,
-                observer_name = "utsab",
-                designation = "designer",
-                form_id = "123321",
-                observer_emai = "abc#top.com",
-                road_code = "1234234",
-                road_name = "godha road",
-                district = "Ramechaap",
-                report_status = 4,
-                uploaded_date = System.DateTime.Now,
-                is_test = true
-            },
-            new {
-                date =System.DateTime.Now,
-                observer_name = "utsab",
-                designation = "designer",
-                form_id = "123321",
-                observer_emai = "abc#top.com",
-                road_code = "1234234",
-                road_name = "godha road",
-                district = "Ramechaap",
-                report_status = 4,
-                uploaded_date = System.DateTime.Now,
-                is_test = true
-            },
-            new {
-                date =System.DateTime.Now,
-                observer_name = "utsab",
-                designation = "designer",
-                form_id = "123321",
-                observer_emai = "abc#top.com",
-                road_code = "1234234",
-                road_name = "godha road",
-                district = "Ramechaap",
-                report_status = 4,
-                uploaded_date = System.DateTime.Now,
-                is_test = true
-            }
-            };
-
-
-            string queyy = @"select monitoring.sp_initial_details(@date, @observer_name,@designation,@form_id,@observer_emai,@road_code,
-                            @road_name,@district,@report_status,@uploaded_date,@is_test)";
-            sqlDataAccess.InsertSp<dynamic>(queyy, id, "Csmdb");
-        }
         private async Task<bool> SaveData()
         {
-            IEnumerable<Inital> initals = await LoadinitalDetails();
-            IEnumerable<ConstructionObservation> constructionObservations = await LoadConstructionObservationsDetails();
-            IEnumerable<Files> files = await LoadFiles();
-            IEnumerable<EventRecording> eventRecordings = await LoadEvents();
             try
             {
+                IEnumerable<Inital> initals = await LoadinitalDetails();
+                IEnumerable<ConstructionObservation> constructionObservations = await LoadConstructionObservationsDetails();
+                IEnumerable<Files> files = await LoadFiles();
+                IEnumerable<EventRecording> eventRecordings = await LoadEvents();
+
                 sqlDataAccess.StartTransaction("Csmdb");
 
                 foreach (var inital in initals)
@@ -122,8 +73,7 @@ namespace Csm.Services.ServicesAccess
                     if ( !(await InitalExistence(inital.form_id)))
                     {
                         await InsertInitial(inital);
-                        await InsertConstructionObservationD(constructionObservations, inital.form_id);
-                        await InsertFile(files, inital.form_id);
+                        await InsertConstructionObservationDandFiles(constructionObservations, inital.form_id, files);
                         await InsertEventsRecording(eventRecordings, inital.form_id);
                     }
                     else
@@ -133,7 +83,6 @@ namespace Csm.Services.ServicesAccess
                         await UpdateEventsRecording(eventRecordings, inital.form_id);
                     }
                 }
-
                 sqlDataAccess.CommintTransaction();
                 return true;
             }
@@ -156,7 +105,7 @@ namespace Csm.Services.ServicesAccess
 
             IEnumerable<Inital> initals = await sqlDataAccess.LoadData<Inital, dynamic>(query, parameter, "Csmdb");
 
-            if ((initals != null) && (!initals.Any()))
+            if ((initals != null) && (initals.Any()))
             {
                 return true;
             }
@@ -188,45 +137,18 @@ namespace Csm.Services.ServicesAccess
             }
         }
 
-        private async Task InsertConstructionObservationD(IEnumerable<ConstructionObservation> constructionObservations , string uuid)
+        private async Task InsertConstructionObservationDandFiles(IEnumerable<ConstructionObservation> constructionObservations , string uuid, IEnumerable<Files> files)
         {
-            foreach(ConstructionObservation observation in constructionObservations.Where(e => e.uuid == uuid))
+            List<Files> filesToSave = new List<Files>();
+            foreach (ConstructionObservation observation in constructionObservations.Where(e => e.uuid == uuid))
             {
                 observation.construction_type.Replace('\'',' ');
                 observation.observation_notes.Replace('\'',' ');
                 observation.location.Replace('\'',' ');
-
-                if(observation.location_type == "Point Location")
-                {
-                    LocationImage(observation.form_id, observation.latitude, observation.longitude);
-                    try
-                    {
-                       await sqlDataAccess.SaveDataInTransaction(PointQuery, observation);
-                    }
-                    catch (Exception)
-                    {
-                        throw;
-                    }
-                }
-                else if(observation.location_type == "Line Location")
-                {
-                    if (observation.line_latitude_to < 26 || observation.line_latitude_to > 31)
-                        observation.line_latitude_to = observation.line_latitude_from;
-
-                    if (observation.line_longitude_to < 81 || observation.line_longitude_to > 89)
-                        observation.line_longitude_to = observation.line_longitude_from;
-
-                    LocationImage(observation.form_id, observation.line_latitude_from, observation.line_latitude_to, observation.line_longitude_from, observation.line_longitude_to);
-                    try
-                    {
-                      await  sqlDataAccess.SaveDataInTransaction(LineQuery, observation);
-                    }
-                    catch (Exception)
-                    {
-                        throw;
-                    }
-                }
+                await ConstructionObservationStoreing(observation);
+                filesToSave.Add(files.FirstOrDefault(x => x.form_id == observation.form_id));
             }
+            await InsertFile(filesToSave);
         }
 
         private async Task UpdateConstructionObservationDandFiles(IEnumerable<ConstructionObservation> constructionObservations, string uuid, IEnumerable<Files> files)
@@ -237,12 +159,18 @@ namespace Csm.Services.ServicesAccess
                 observation.construction_type.Replace('\'', ' ');
                 observation.observation_notes.Replace('\'', ' ');
                 observation.location.Replace('\'', ' ');
+                string query;
+
+                if (observation.location_type == "Point Location")
+                    query = ConstructionUpdatePoint;
+                else
+                    query = ConstructionUpdateLine;
 
                 if ((await ConstructionObservationExistence(observation.form_id)))
                 {
                     try
                     {
-                        await sqlDataAccess.SaveDataInTransaction(ConstructionUpdate, observation);
+                        await sqlDataAccess.SaveDataInTransaction(query, observation);
                     }
                     catch (Exception)
                     {
@@ -251,40 +179,45 @@ namespace Csm.Services.ServicesAccess
                 }
                 else
                 {
-                    if (observation.location_type == "Point Location")
-                    {
-                        LocationImage(observation.form_id, observation.latitude, observation.longitude);
-                        try
-                        {
-                            await sqlDataAccess.SaveDataInTransaction(PointQuery, observation);
-                        }
-                        catch (Exception)
-                        {
-                            throw;
-                        }
-                    }
-                    else if (observation.location_type == "Line Location")
-                    {
-                        if (observation.line_latitude_to < 26 || observation.line_latitude_to > 31)
-                            observation.line_latitude_to = observation.line_latitude_from;
-
-                        if (observation.line_longitude_to < 81 || observation.line_longitude_to > 89)
-                            observation.line_longitude_to = observation.line_longitude_from;
-
-                        LocationImage(observation.form_id, observation.line_latitude_from, observation.line_latitude_to, observation.line_longitude_from, observation.line_longitude_to);
-                        try
-                        {
-                            await sqlDataAccess.SaveDataInTransaction(LineQuery, observation);
-                        }
-                        catch (Exception)
-                        {
-                            throw;
-                        }
-                    }
+                    await ConstructionObservationStoreing(observation);
                     Newfiles.Add(files.FirstOrDefault(x => x.form_id == observation.form_id));
                 }
             }
-            await InsertFile(Newfiles, uuid);
+            if (Newfiles.Any())  await InsertFile(Newfiles);
+        }
+
+        private async Task ConstructionObservationStoreing(ConstructionObservation observation)
+        {
+            if (observation.location_type == "Point Location")
+            {
+                try
+                {
+                    LocationImage(observation.form_id, observation.latitude, observation.longitude);
+                    await sqlDataAccess.SaveDataInTransaction(PointQuery, observation);
+                }
+                catch (Exception)
+                {
+                    throw;
+                }
+            }
+            else if (observation.location_type == "Line Location")
+            {
+                if (observation.line_latitude_to < 26 || observation.line_latitude_to > 31)
+                    observation.line_latitude_to = observation.line_latitude_from;
+
+                if (observation.line_longitude_to < 81 || observation.line_longitude_to > 89)
+                    observation.line_longitude_to = observation.line_longitude_from;
+
+                try
+                {
+                    LocationImage(observation.form_id, observation.line_latitude_from, observation.line_latitude_to, observation.line_longitude_from, observation.line_longitude_to);
+                    await sqlDataAccess.SaveDataInTransaction(LineQuery, observation);
+                }
+                catch (Exception)
+                {
+                    throw;
+                }
+            }
         }
 
         private async Task<bool> ConstructionObservationExistence(string formId)
@@ -298,7 +231,7 @@ namespace Csm.Services.ServicesAccess
 
             IEnumerable<ConstructionObservation> initals = await sqlDataAccess.LoadData<ConstructionObservation, dynamic>(query, parameter, "Csmdb");
 
-            if ((initals != null) && (!initals.Any()))
+            if ((initals != null) && (initals.Any()))
             {
                 return true;
             }
@@ -306,9 +239,9 @@ namespace Csm.Services.ServicesAccess
             return false;
         }
 
-        private async Task InsertFile(IEnumerable<Files> files, string uuid)
+        private async Task InsertFile(IEnumerable<Files> files)
         {
-            foreach(Files file in files.Where(x => x.uuid == uuid))
+            foreach(Files file in files)
             {
                 try
                 {
@@ -405,7 +338,7 @@ namespace Csm.Services.ServicesAccess
 
             IEnumerable<EventRecording> initals = await sqlDataAccess.LoadData<EventRecording, dynamic>(query, parameter, "Csmdb");
 
-            if ((initals != null) && (!initals.Any()))
+            if ((initals != null) && (initals.Any()))
             {
                 return true;
             }
@@ -421,22 +354,29 @@ namespace Csm.Services.ServicesAccess
             , form_id = @form_id, observer_email = @observer_email , road_code = @road_code , road_name =@road_name , district = @district, 
             report_status =@report_status, uploaded_date = @uploaded_date, is_test =@is_test WHERE form_id=@form_id";
 
-        private string ConstructionUpdate = @"UPDATE monitoring.construction_observation_detail SET road_code=@road_code, construction_type=@construction_type,
+        private string ConstructionUpdatePoint = @"UPDATE monitoring.construction_observation_detail SET road_code=@road_code, construction_type=@construction_type,
         location=@location, observation_notes=@observation_notes, quality_rating=@quality_rating, latitude=@latitude, longitude=@longitude, 
         line_latitude_from= @line_latitude_from, line_longitude_from=@line_longitude_from, line_latitude_to=@line_latitude_to, line_longitude_to=@line_longitude_to, 
-        altitude=@altitude, date=@date where form_id= @form_id";
+        altitude=@altitude, date=@date , point_geom= ST_SetSRID(ST_MakePoint(@longitude,@latitude),4326) where form_id= @form_id";
+        
+        private string ConstructionUpdateLine = @"UPDATE monitoring.construction_observation_detail SET road_code=@road_code, construction_type=@construction_type,
+        location=@location, observation_notes=@observation_notes, quality_rating=@quality_rating, latitude=@latitude, longitude=@longitude, 
+        line_latitude_from= @line_latitude_from, line_longitude_from=@line_longitude_from, line_latitude_to=@line_latitude_to, line_longitude_to=@line_longitude_to, 
+        altitude=@altitude, date=@date ,
+        the_geom = ST_SetSRID(ST_MakeLine(ST_MakePoint(@line_longitude_from,@line_latitude_from), ST_MakePoint(@line_longitude_to,@line_latitude_to)),4326)
+        where form_id= @form_id";
 
         private readonly string PointQuery = @"INSERT INTO monitoring.construction_observation_detail 
             (uuid, form_id, construction_type, location, observation_notes, quality_rating, latitude,longitude, altitude,date, road_code,location_type, 
             point_geom) VALUES 
             (@uuid, @form_id, @construction_type, @location, @observation_notes, @quality_rating, @latitude,@longitude,@altitude,@date,@road_code,@location_type,
-            ST_SetSRID(ST_MakePoint(longitude,latitude),4326)";
+            ST_SetSRID(ST_MakePoint(@longitude,@latitude),4326))";
 
         private readonly string LineQuery = @"INSERT INTO monitoring.construction_observation_detail 
             (uuid, form_id, construction_type, location, observation_notes, quality_rating, altitude,date, road_code,location_type, 
             the_geom,line_latitude_from,line_longitude_from,line_latitude_to,line_longitude_to) VALUES 
             (@uuid, @form_id, @construction_type, @location, @observation_notes, @quality_rating, @altitude,@date,@road_code,@location_type,
-            ST_SetSRID(ST_MakeLine(ST_MakePoint(line_longitude_from,line_latitude_from), ST_MakePoint(line_longitude_to,line_latitude_to)),4326),
+            ST_SetSRID(ST_MakeLine(ST_MakePoint(@line_longitude_from,@line_latitude_from), ST_MakePoint(@line_longitude_to,@line_latitude_to)),4326),
             @line_latitude_from,@line_longitude_from,@line_latitude_to,@line_longitude_to)";
 
         private readonly string FileQuery = @"insert into monitoring.file 
@@ -445,7 +385,7 @@ namespace Csm.Services.ServicesAccess
 
         private readonly string EventsQuery = @"insert into monitoring.event_recording
             (uuid,district,road_link ,river_name,latitude,longitude,division,events,remarks,observations, msg_priority,form_id, date, road_code) 
-            values( @uuid, @district, @road_link, @river_name, @latitude, @longitude, @division, @events, @remarks,
+            values ( @uuid, @district, @road_link, @river_name, @latitude, @longitude, @division, @events, @remarks,
             @observations, @msg_priority, @form_id, @date, @road_code)";
         
         private readonly string EventsQueryUpdate = @"UPDATE monitoring.event_recording SET
@@ -540,7 +480,7 @@ namespace Csm.Services.ServicesAccess
 
         private async Task<IEnumerable<Files>> LoadFiles()
         {
-            string query = @"select file_id, form_id, file_name, file_note, unique_file, file_type from file";
+            string query = @"select uuid, file_id, form_id, file_name, file_note, unique_file, file_type from file";
 
             return await sqlLiteDataAccess.LoadSqLiteData<Files, dynamic>(query, new { }, SqlLitePath);
         }

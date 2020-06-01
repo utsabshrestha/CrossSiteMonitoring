@@ -8,6 +8,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="wwwroot\NewFolder\**" />
+    <Content Remove="wwwroot\NewFolder\**" />
+    <EmbeddedResource Remove="wwwroot\NewFolder\**" />
+    <None Remove="wwwroot\NewFolder\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Remove="Controllers\TokenController.cs" />
     <Compile Remove="Migrations\20200318075049_UserTableNameEdit.cs" />
     <Compile Remove="Migrations\20200318075049_UserTableNameEdit.Designer.cs" />
@@ -39,6 +46,7 @@
 
 
   <ItemGroup>
+    <Folder Include="wwwroot\AppImages\" />
     <Folder Include="wwwroot\Mapping\" />
     <Folder Include="wwwroot\sqlFiles\" />
   </ItemGroup>

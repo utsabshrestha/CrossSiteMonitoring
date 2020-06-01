@@ -8,23 +8,19 @@ namespace DataAccessLibrary.Models
     {
         public enum stat
         {
-            Success,
             Failed,
+            Success,
             Error
         }
 
         private stat Status { get; set; }
         public string Message { get; set; }
 
+        public stat getstatus => this.Status;
+
         public void setStatus(stat s)
         {
             this.Status = s;
         }
-
-        public stat getStatus()
-        {
-            return this.Status;
-        }
-
     }
 }

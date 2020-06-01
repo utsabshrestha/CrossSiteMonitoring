@@ -16,11 +16,9 @@ namespace DataAccessLibrary.Models
         public string road_name { get; set; }
         public string district { get; set; }
         public int report_status { get; set; }
-        public string uploaded_date 
+        public DateTime uploaded_date 
         {
-            get { return this.uploaded_date; }
-            set { this.uploaded_date = DateTime.Now.ToString("yyyy-dd-mm"); 
-            } 
+            get { return DateTime.Now; }
         }
         public bool is_test { get; set; }
     }
