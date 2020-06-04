@@ -1,6 +1,8 @@
 ﻿using Dapper;
 using DataAccessLibrary.DataAccessLayer.Interfaces;
+using DataAccessLibrary.DataHelper;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using Npgsql;
 using System;
 using System.Collections.Generic;
@@ -13,19 +15,18 @@ namespace DataAccessLibrary.DataAccessLayer.DataAccess
 {
     public class SqlDataAccess : IDisposable, ISqlDataAccess
     {
-        private readonly IConfiguration configuration;
         private IDbConnection _connection;
         private IDbTransaction _transaction;
         private bool isClosed = false;
-
-        public SqlDataAccess(IConfiguration configuration)
+        private CsmData settings;
+        public SqlDataAccess(IOptions<CsmData> options)
         {
-            this.configuration = configuration;
+            settings = options.Value;
         }
 
         public string GetConnectionString(String ConnectionStringName)
         {
-            return configuration.GetConnectionString(ConnectionStringName);
+            return settings.Csmdb;
         }
 
         public async Task<IEnumerable<T>> LoadData<T, U>(string queries, U parameters, string ConnectionStringName)

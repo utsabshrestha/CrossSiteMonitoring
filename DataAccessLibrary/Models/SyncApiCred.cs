@@ -13,9 +13,6 @@ namespace DataAccessLibrary.Models
         [Required]
         public string filename { get; set; }
         [Required]
-        [DataType(DataType.Password)]
-        public string password { get; set; }
-        [Required]
         public IFormFile dbfile { get; set; }
     }
 }

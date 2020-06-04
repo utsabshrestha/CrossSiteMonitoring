@@ -20,6 +20,11 @@ using DataAccessLibrary.DataAccessLayer.DataAccess;
 using Csm.Services.ServiceInterface;
 using Csm.Services.ServicesAccess;
 using DataAccessLibrary.DataAccessLayer.Interfaces;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
+using Csm.Web.Extensions;
+using DataAccessLibrary.DataHelper;
+using Swashbuckle.Application;
 
 namespace Csm.Web
 {
@@ -56,26 +61,51 @@ namespace Csm.Web
             //AutoMapper
             services.AddAutoMapper(typeof(Startup));
 
-            //HttpClient
-            //services.AddHttpClient();
-
             services.AddControllersWithViews();
             services.AddRazorPages()
                 .AddRazorRuntimeCompilation();
 
+            // configure strongly typed settings objects
+            services.Configure<CsmSettings>(options => Configuration.GetSection("CsmSettings").Bind(options));
+            var csmSettings = Configuration.GetSection("CsmSettings").Get<CsmSettings>();
+            // connection string 
+            services.Configure<CsmData>(options => Configuration.GetSection("ConnectionStrings").Bind(options));
 
-            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+            //jtw
+            services.AddAuthentication()
+                .AddCookie(cfg => cfg.SlidingExpiration = true)
+                .AddJwtBearer(cfg =>
+                {
+                    cfg.TokenValidationParameters = new TokenValidationParameters()
+                    {
+                        ValidateIssuerSigningKey = true,
+                        ValidIssuer = csmSettings.Issuer,
+                        ValidAudience = csmSettings.Audience,
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(csmSettings.SecretKey)),
+                        ValidateLifetime = true
+                    };
+                }
+                );
 
-            // services.AddSwaggerGen(setup =>
-            //{
-            //    setup.SwaggerDoc(
-            //            "v1",
-            //            new OpenApiInfo
-            //            {
-            //                Title = "Cross Site Monitoring API",
-            //                Version = "v1"
-            //            });
-            //});
+            //Swagger
+            services.AddSwaggerGen(setup =>
+           {
+               setup.SwaggerDoc(
+                       "v1",
+                       new OpenApiInfo
+                       {
+                           Title = "Cross Site Monitoring API",
+                           Version = "v1"
+                       });
+               setup.AddSecurityDefinition("bearer", new OpenApiSecurityScheme
+               {
+                   Type = SecuritySchemeType.Http,
+                   BearerFormat = "JWT",
+                   In = ParameterLocation.Header,
+                   Scheme = "bearer"
+               });
+               setup.OperationFilter<AuthenticationRequirementsOperationFilter>();
+           });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -100,11 +130,11 @@ namespace Csm.Web
             app.UseAuthentication();
             app.UseAuthorization();
 
-            //app.UseSwagger();
-            //app.UseSwaggerUI(x =>
-            //{
-            //    x.SwaggerEndpoint("/swagger/v1/swagger.json", "CSM API v1");
-            //});
+            app.UseSwagger();
+            app.UseSwaggerUI(x =>
+            {
+                x.SwaggerEndpoint("/swagger/v1/swagger.json", "CSM API v1");
+            });
 
             app.UseEndpoints(endpoints =>
             {
@@ -113,15 +143,6 @@ namespace Csm.Web
                 pattern: "{controller=Home}/{action=Index}/{id?}");
                 endpoints.MapRazorPages();
             });
-
-            //try
-            //{
-            //    System.IO.File.WriteAllText("browsersync-update.txt", DateTime.Now.ToString());
-            //}
-            //catch
-            //{
-
-            //}
         }
     }
 }

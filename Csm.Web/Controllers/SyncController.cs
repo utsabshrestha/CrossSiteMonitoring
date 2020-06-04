@@ -4,8 +4,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using Csm.Services.ServiceInterface;
 using Csm.Services.ServicesAccess;
+using Csm.Web.Extensions;
 using Csm.Web.Models;
 using DataAccessLibrary.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -15,6 +17,7 @@ namespace Csm.Web.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(AuthenticationSchemes = CsmJwtConstants.AuthSchemes)]
     public class SyncController : ControllerBase
     {
         private readonly UserManager<ApplicationUser> userManager;
@@ -46,7 +49,7 @@ namespace Csm.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> Post([FromForm] SyncApiCred apiCred)
         {
-            if (ModelState.IsValid && ( await Login(apiCred.username, apiCred.password)))
+            if (ModelState.IsValid)
             {
                 var process = await syncApi.SyncData(apiCred);
                 if(process.getstatus == SyncStatus.stat.Success)
@@ -55,22 +58,13 @@ namespace Csm.Web.Controllers
                 }
                 return BadRequest(new { status = process.getstatus.ToString(), statusCode = process.getstatus, message = process.Message });
             }
-            return BadRequest(new { status = "Error", message = "Invalid attempt to Login." });
+            return BadRequest(new { status = "Error", message = "Not sufficient information.", statusCode = 0 });
         }
 
-        private async Task<bool> Login(string username, string password)
+        private async Task<bool> IsValidUsernameAndPassword(string username, string password)
         {
             var user = await userManager.FindByNameAsync(username) ?? await userManager.FindByEmailAsync(username);
-             if(user != null)
-            {
-                var result = await signInManager.PasswordSignInAsync(user, password, false, false);
-                if (result.Succeeded)
-                {
-                    return true;
-                }
-                return false;
-            }
-            return false;
+            return await userManager.CheckPasswordAsync(user, password);
         }
     }
 }
