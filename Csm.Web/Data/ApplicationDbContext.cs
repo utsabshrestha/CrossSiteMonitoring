@@ -20,6 +20,8 @@ namespace Csm.Web.Data
         {
             base.OnModelCreating(builder);
 
+            //builder.HasDefaultSchema("monitoring");
+
             //cascading off in aspuser with role for role deletion
             foreach (var foreignKey in builder.Model.GetEntityTypes().SelectMany(e => e.GetForeignKeys()))
             {

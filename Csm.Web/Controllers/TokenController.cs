@@ -84,7 +84,7 @@ namespace Csm.Web.Controllers
                     settings.Issuer,
                     settings.Audience,
                     claims,
-                    expires: DateTime.UtcNow.AddHours(3),
+                    expires: DateTime.UtcNow.AddDays(1),
                     signingCredentials: creds
                 );
 

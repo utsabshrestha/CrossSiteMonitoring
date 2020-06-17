@@ -1,4 +1,4 @@
-﻿using DataAccessLibrary.Models;
+﻿using Csm.Web.Models;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System;
 using System.Collections.Generic;
@@ -12,9 +12,9 @@ namespace Csm.Web.ViewModels
         public RoadListViewModel()
         {
             district_all = new List<SelectListItem>();
-            RoadList = new List<Road>();
+            RoadList = new List<RoadList>();
         }
-        public IList<Road> RoadList { get; set; }
+        public IList<RoadList> RoadList { get; set; }
         public List<SelectListItem> district_all { get; set; }
         public string districtSelected { get; set; }
     }

@@ -10,8 +10,8 @@ namespace DataAccessLibrary.Models
     {
         [Required]
         public string username { get; set; }
-        [Required]
-        public string filename { get; set; }
+        //[Required]
+        //public string filename { get; set; }
         [Required]
         public IFormFile dbfile { get; set; }
     }

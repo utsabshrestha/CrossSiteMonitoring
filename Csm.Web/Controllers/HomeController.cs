@@ -17,6 +17,7 @@ namespace Csm.Web.Controllers
         //private readonly RoleManager<ApplicationUser> _roleManager;
         //private readonly UserManager<ApplicationUser> _userManager;
         //, RoleManager<ApplicationUser> roleManager, UserManager<ApplicationUser> userManager
+        
         public HomeController(ILogger<HomeController> logger)
         {
             _logger = logger;

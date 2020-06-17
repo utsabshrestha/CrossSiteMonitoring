@@ -10,6 +10,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - Construction Site Monitoring Site </title>
 
+    @*
+
+        Css
+
+    *@
     <link href="~/lib/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link href="~/lib/bootstrap/dist/css/bootstrap-grid.css" rel="stylesheet" />
     <link href="~/lib/bootstrap/dist/css/bootstrap-reboot.css" rel="stylesheet" />
@@ -17,13 +22,21 @@
     <link rel="stylesheet" href="~/css/site.css" />
 
 
+    @*
+
+        Scripts
+
+    *@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
 
-    @*<link href="https://gitcdn.github.io/bootstrap-toggle/2.2.2/css/bootstrap-toggle.min.css" rel="stylesheet">*@
+    @*
+        Unused
+        <link href="https://gitcdn.github.io/bootstrap-toggle/2.2.2/css/bootstrap-toggle.min.css" rel="stylesheet">
+
+    *@
 
     <style>
         a.anchor {
@@ -42,69 +55,85 @@
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3 fixed-top themeColor">
-            <div class="container">
-                <a class="navbar-brand text-white" asp-area="" asp-controller="Home" asp-action="Index">CrossSiteMonitoring</a>
-                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex ">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-white" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-white" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
-                        @if (signInManager.IsSignedIn(User))
-                        {
+        @*<nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3 fixed-top themeColor">*@
+        <div id="navshrink">
+            <nav class="navbar navbar-expand-lg navbar-toggleable-sm themeColor">
+                <div class="container">
+                    <a class="navbar-brand text-white" asp-area="" asp-controller="Home" asp-action="Index" id="Logo">CrossSiteMonitoring</a>
+                    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                            aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <div class="navbar-collapse collapse d-sm-inline-flex">
+                        <ul class="navbar-nav flex-grow-1">
                             <li class="nav-item">
-                                <a class="nav-link text-white" asp-area="" asp-controller="Dashboard" asp-action="ListRoads">Site Visit</a>
+                                <a class="nav-link text-white" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                             </li>
-
-                            if (User.IsInRole("Admin"))
+                            <li class="nav-item">
+                                <a class="nav-link text-white" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                            </li>
+                            @if (signInManager.IsSignedIn(User))
                             {
-                                <li class="nav-item dropdown">
-                                    <a class="nav-link dropdown-toggle text-white" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                        Manage
-                                    </a>
-                                    <div class="dropdown-menu" aria-labelledby="navbarDropdown" style="top:135%">
-                                        <h6 class="dropdown-header">Manage Users</h6>
-                                        <a class="dropdown-item" asp-controller="Administration" asp-action="ListUsers">Users</a>
-                                        <a class="dropdown-item" asp-controller="Administration" asp-action="ListRoles">Roles</a>
-                                        <a class="dropdown-item" asp-area="" asp-controller="Account" asp-action="Register">User Register</a>
+                                <li class="nav-item">
+                                    <a class="nav-link text-white" asp-area="" asp-controller="Dashboard" asp-action="ListRoads">Site Visit</a>
+                                </li>
+                                <li class="nav-item dropdown navdown">
+                                    <a class="nav-link dropdown-toggle text-white" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Dropdown</a>
+                                    <div class="dropdown-menu themeColor">
+                                        <a class="dropdown-item" href="#">Action</a>
+                                        <div class="dropdown-divider"></div>
+                                        <a class="dropdown-item" href="#">Another action</a>
+                                        <a class="dropdown-item" href="#">Something else here</a>
+                                        <a class="dropdown-item" href="#">Separated link</a>
                                     </div>
                                 </li>
+                                if (User.IsInRole("Admin"))
+                                {
+                                    <li class="nav-item dropdown navdown">
+                                        <a class="nav-link dropdown-toggle text-white" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            Manage
+                                        </a>
+                                        <div class="dropdown-menu themeColor" aria-labelledby="navbarDropdown">
+                                            <h6 class="dropdown-header">Manage Users</h6>
+                                            <div class="dropdown-divider"></div>
+                                            <a class="dropdown-item" asp-controller="Administration" asp-action="ListUsers">Users</a>
+                                            <a class="dropdown-item" asp-controller="Administration" asp-action="ListRoles">Roles</a>
+                                            <a class="dropdown-item" asp-area="" asp-controller="Account" asp-action="Register">User Register</a>
+                                        </div>
+                                    </li>
+                                }
                             }
-                        }
-                    </ul>
-                    <ul class="navbar-nav">
-                        @if (signInManager.IsSignedIn(User))
-                        {
-                            @*<li class="nav-item">
-                                <a class="nav-link text-white" asp-area="" asp-controller="Account" asp-action="Register">User Register</a>
-                                </li>*@
-                            <li class="nav-item">
-                                <a class="nav-link text-white" title="Manage">Hello @User.Identity.Name!</a>
-                            </li>
-                            <li class="nav-item">
-                                <form method="post" asp-action="logout" asp-controller="account">
-                                    <button type="submit" class="nav-link btn btn-link text-white">Logout</button>
-                                </form>
-                            </li>
-                        }
-                        else
-                        {
-                            <li class="nav-item">
-                                <a class="nav-link text-white" asp-area="" asp-controller="Account" asp-action="Login">Login</a>
-                            </li>
-                        }
-                    </ul>
+                        </ul>
+                        <ul class="navbar-nav">
+                            @if (signInManager.IsSignedIn(User))
+                            {
+                                @*<li class="nav-item">
+                                    <a class="nav-link text-white" asp-area="" asp-controller="Account" asp-action="Register">User Register</a>
+                                    </li>*@
+                                <li class="nav-item">
+                                    <a class="nav-link text-white" title="Manage">Hello @User.Identity.Name!</a>
+                                </li>
+                                <li class="nav-item">
+                                    <form method="post" asp-action="logout" asp-controller="account">
+                                        <button style="font-size: 17px;" type="submit" class="nav-link btn btn-link text-white">Logout</button>
+                                    </form>
+                                </li>
+                            }
+                            else
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link text-white" asp-area="" asp-controller="Account" asp-action="Login">Login</a>
+                                </li>
+                            }
+                        </ul>
+                    </div>
                 </div>
-            </div>
-        </nav>
+            </nav>
+        </div>
+
+
     </header>
+
     <div class="container mainContainer">
         <main role="main" class="pb-3">
             @RenderBody()
@@ -117,12 +146,16 @@
         </div>
     </footer>
 
+    @*
+    
+        site js
+    *@
+    <script src="~/js/site.js" asp-append-version="true"></script>
 
 
     @if (IsSectionDefined("Scripts"))
     {
         @RenderSection("Scripts", required: true)
     }
-
 </body>
 </html>

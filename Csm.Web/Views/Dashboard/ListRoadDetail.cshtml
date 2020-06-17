@@ -6,22 +6,81 @@
     ViewBag.Title = "Construction Site Monitoring Dashboard";
     var i = 1;
     var user = await userManager.GetUserAsync(User);
+    var message = ViewData["Message"]?.ToString() ?? null;
+    var district = ViewData["district"]?.ToString() ?? null;
 }
+
+
+
+
+
+@if (!String.IsNullOrEmpty(district))
+{
+    <div class="mb-3">
+        <div class="row">
+            <div class="col-md-auto">
+                <form asp-action="ListRoads" method="post">
+                    <input asp-for="@district" name="districtSelected" type="hidden" />
+                    <button type="submit" class="btn btn-lg" style="font-weight:500; color: #0366d6">Go Back to @district District</button>
+                </form>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <div class="mb-3">
+        <div class="row">
+            <div class="col-md-auto">
+                <a class="btn btn-lg" style="font-weight: 500; color: #0355d6" asp-action="ListRoads">Go Back</a>
+            </div>
+        </div>
+    </div>
+}
+
+
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content" style="border-radius: 0px;">
+            <div class="modal-header">
+                <h6 class="modal-title " id="exampleModalLabel" style="color: #0366d6; font-size: 17px;">Report Finalized ?</h6>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body dropdown-header">
+                Are you sure you want to finalized this Report ?
+                <br />
+                Make sure you View the Report before Finalized it.
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary final btn-sm" onclick="ReportFinalize()">Finalaize Report</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@* For the Notification*@
+<div class="notifyme">
+    <div class="toast notifyme-in" role="alert" data-delay="1700" data-autohide="true">
+        <div class="toast-header">
+            <strong class="mr-auto text-primary">CrossSiteMonitoring</strong>
+            <small class="text-muted">Just now</small>
+            <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
+                <span aria-hidden="true">×</span>
+            </button>
+        </div>
+        <div class="toast-body" id="msg">  Hey, there! This is a Bootstrap 4 toast. </div>
+    </div>
+</div>
 
 @if (Model.Any())
 {
-
-    <div class="row">
-        <form asp-action="ListRoads" method="post">
-            <input asp-for="@Model.First().district" name="districtSelected" type="hidden" />
-            <button type="submit" class="btn btn-lg" style="font-weight:600; color: #0366d6">Go to @Model.First().district District</button>
-        </form>
-    </div>
-
-    <div class="mb-5"></div>
-
     <table id="example" class="table table-hover" style="width:100%">
-        <thead>
+        <thead id="headTable">
             <tr>
                 <th scope="col">SN</th>
                 <th scope="col">Observer Name</th>
@@ -44,11 +103,11 @@
                     <td>
                         @if (road.report_status == 1)
                         {
-                            <a href="#" class="btn btn-sm styleMy">Final Report</a>
+                            <a href="#" class="btn btn-sm styleMy" id="@road.ini_id+stat">Final Report</a>
                         }
                         else
                         {
-                            <a href="#" class="btn btn-sm  styleMy" style="color: darkturquoise !important">Pending!</a>
+                            <a href="#" class="btn btn-sm  styleMy" style="color: darkturquoise !important" id="@road.ini_id+stat">Pending!</a>
                         }
                     </td>
                     <td>
@@ -57,21 +116,23 @@
                             <a class="nav-link dropdown-toggle text-primary" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 Actions!
                             </a>
-                            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <div class="dropdown-menu drpmenu" aria-labelledby="navbarDropdown">
                                 <h6 class="dropdown-header">Manage Reports</h6>
 
                                 @if ((User.IsInRole("Admin") || user.Email == road.observer_email) && road.report_status == 0)
                                 {
-                                    <a class="dropdown-item" href="#" type="button">Finalize</a>
+                                    <form method="post" id="@road.form_id">
+                                        <a href="javascript:void(0);" data-toggle="modal" data-target="#exampleModal" id="@road.ini_id" class="btn dropdown-item" onclick="Finalize('@road.form_id','@road.road_code','@road.date','@road.observer_email','@road.road_name','@road.ini_id')">Finalize</a>
+                                    </form>
                                 }
 
                                 @if (user.Email == road.observer_email || User.IsInRole("Admin") || road.report_status == 1)
                                 {
                                     <form asp-action="ViewReport" method="post" class="dropdown-item">
+                                        <input value="@road.form_id" name="form_id" type="hidden" />
                                         <input value="@road.road_code" name="road_code" type="hidden" />
                                         <input value="@road.date" name="date" type="hidden" />
                                         <input value="@road.observer_email" name="observer_email" type="hidden" />
-                                        <input value="@road.road_name" name="road_name" type="hidden" />
                                         <button class="btn dropdown-item" type="submit" style="padding: 0px;" formtarget="_blank">View Report</button>
                                     </form>
                                 }
@@ -84,7 +145,14 @@
                                 {
                                     if (road.report_status == 0)
                                     {
-                                        <a class="dropdown-item" href="#" type="button">Edit Report</a>
+                                        <form asp-action="EditConstructionReport" method="post" class="dropdown-item">
+                                            <input value="@road.form_id" name="form_id" type="hidden" />
+                                            <input value="@road.road_code" name="road_code" type="hidden" />
+                                            <input value="@road.date" name="date" type="hidden" />
+                                            <input value="@road.observer_email" name="observer_email" type="hidden" />
+                                            <input value="@road.road_name" name="road_name" type="hidden" />
+                                            <button class="btn dropdown-item" type="submit" style="padding: 0px;" formtarget="_blank">Edit This Report</button>
+                                        </form>
                                     }
 
                                     if (User.IsInRole("Admin"))
@@ -102,6 +170,8 @@
             }
         </tbody>
     </table>
+    <br />
+    <br />
 }
 else
 {
@@ -112,8 +182,16 @@ else
     </div>
 }
 
+
+<script>
+    function getUrl()
+    {
+        return "@message";
+    }
+</script>
 @section Scripts{
     <script src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.10.20/js/dataTables.bootstrap4.min.js"></script>
     <script src="~/js/DataTableBootstrp.js"></script>
+    <script src="~/js/FinalaizeReport.js"></script>
 }

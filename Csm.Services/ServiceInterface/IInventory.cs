@@ -13,7 +13,11 @@ namespace Csm.Services.ServiceInterface
         Task<IEnumerable<RoadDetails>> GetRoadDetails(string roadCode, string district);
         Task<IEnumerable<Road>> GetRoads();
         Task<IEnumerable<Road>> GetRoads(string district);
-        Task<IEnumerable<ReportDataModel>> GetReportDataList(string roadeCode, DateTime date, string observerEmail);
+        Task<IEnumerable<ReportDataModel>> GetReportDataList(string form_id ,string roadeCode, string observerEmail);
+        Task<IEnumerable<Inital>> CheckReportEmail(string form_id, string roadeCode, string observerEmail);
+        Task<int> UpdateReportStatus(string form_id, string roadCode, string observerEmail);
+        Task<GenericReport<T, U, R>> GetWholeReport<T, U, R>(string form_id, string road_code);
+        Task<int> UpdateConstructionObservation(ConstructionObservation constructionObservation);
     }
 }
         

@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Csm.Web", "Csm.Web\Csm.Web.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataAccessLibrary", "DataAccessLibrary\DataAccessLibrary.csproj", "{F3AE1F0D-EA31-475F-97FB-92A3A41B868D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Csm.Services", "Csm.Services\Csm.Services.csproj", "{2C1EEA76-678B-4610-971A-DB4D57518032}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Csm.Services", "Csm.Services\Csm.Services.csproj", "{2C1EEA76-678B-4610-971A-DB4D57518032}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

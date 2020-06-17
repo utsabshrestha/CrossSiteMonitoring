@@ -5,10 +5,7 @@
     var sn = 1;
 }
 
-<div class="mb-5"></div>
-
-
-<div class="mb-5">
+<div class="mb-4">
     <div class="row">
         <div class="col-md-auto">
             <h5 class="colorMe">Construction Site Visit</h5>
@@ -28,12 +25,11 @@
 {
 <div id="TableBox">
     <table id="example" class="table table-hover" style="width:100%">
-        <thead>
+        <thead id="headTable">
             <tr>
                 <th scope="col">SN</th>
                 <th scope="col">Road Code</th>
                 <th scope="col">District</th>
-                <th scope="col">Road Name</th>
                 <th scope="col" style="width: 17%">Last Uploaded Date</th>
                 <th scope="col" style="width: 17%">Action</th>
             </tr>
@@ -45,14 +41,11 @@
                     <th scope="row">@sn</th>
                     <td>@Model.RoadList[i].road_code</td>
                     <td>@Model.RoadList[i].district</td>
-                    <td>@Model.RoadList[i].road_name</td>
-                    <td>@Model.RoadList[i].uploadDate.Year-@Model.RoadList[i].uploadDate.Month-@Model.RoadList[i].uploadDate.Day</td>
+                    <td>@Model.RoadList[i].last_uploaded_date.ToString("dd/MM/yyyy")</td>
                     <td>
                         <form method="post" asp-action="ListRoadDetail">
                             <input type="hidden" asp-for="@Model.RoadList[i].road_code" name="road_code" />
-                            <input type="hidden" asp-for="@Model.RoadList[i].uploadDate" name="uploadDate" />
-                            <input type="hidden" asp-for="@Model.RoadList[i].id" name="id" />
-                            <input type="hidden" asp-for="@Model.RoadList[i].road_name" name="road_name" />
+                            <input type="hidden" asp-for="@Model.RoadList[i].last_uploaded_date" name="uploadDate" />
                             <input type="hidden" asp-for="@Model.RoadList[i].district" name="district" />
                             <button type="submit" class="btn btn-light">View All Visit</button>
                         </form>

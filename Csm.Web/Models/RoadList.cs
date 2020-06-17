@@ -9,11 +9,8 @@ namespace Csm.Web.Models
 {
     public class RoadList
     {
-        public int id { get; set; }
         public string road_code { get; set; }
-        public string road_name { get; set; }
         public string district { get; set; }
-        public DateTime date { get; set; }
-        public DateTime uploadDate { get; set; }
+        public DateTime last_uploaded_date { get; set; }
     }
 }

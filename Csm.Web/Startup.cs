@@ -25,6 +25,7 @@ using Microsoft.OpenApi.Models;
 using Csm.Web.Extensions;
 using DataAccessLibrary.DataHelper;
 using Swashbuckle.Application;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Csm.Web
 {
@@ -40,7 +41,7 @@ namespace Csm.Web
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContextPool<ApplicationDbContext>(o => o.UseNpgsql(Configuration.GetConnectionString("Csmdb"),
+            services.AddDbContextPool<ApplicationDbContext>(options => options.UseNpgsql(Configuration.GetConnectionString("Csmdb"),
             options => options.SetPostgresVersion(new Version(9, 6))));
 
             //Identity Api password defination
@@ -64,6 +65,9 @@ namespace Csm.Web
             services.AddControllersWithViews();
             services.AddRazorPages()
                 .AddRazorRuntimeCompilation();
+
+            //CSRF Global Filter.
+            services.AddMvc(options => options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute()));
 
             // configure strongly typed settings objects
             services.Configure<CsmSettings>(options => Configuration.GetSection("CsmSettings").Bind(options));

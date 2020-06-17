@@ -12,8 +12,8 @@ namespace DataAccessLibrary.DataAccessLayer.Interfaces
         Task<IEnumerable<T>> LoadData<T, U>(string queries, U parameters, string ConnectionStringName);
         IList<T> LoadDataFrmSP<T, U>(string storedProcedure, U parameters, string connectionStringName);
         void InsertSp<U>(string sp, List<U> param, string cons);
+        Task<int> InsertRow<U>(string query, U parameters, string connectionStringName);
         void StartTransaction(string ConnectionStringName);
-
         Task SaveDataInTransaction<U>(string queries, List<U> parameters);
         Task SaveDataInTransaction<U>(string queries, U parameters);
 

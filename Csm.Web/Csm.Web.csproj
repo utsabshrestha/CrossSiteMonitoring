@@ -5,6 +5,7 @@
     <UserSecretsId>aspnet-Csm.Web-60296FA5-098B-4B0B-A185-80AA7D7E1D2E</UserSecretsId>
     <RootNamespace>Csm.Web</RootNamespace>
     <AssemblyName>Csm.Web</AssemblyName>
+    <OutputType>Exe</OutputType>
   </PropertyGroup>
 
   <ItemGroup>

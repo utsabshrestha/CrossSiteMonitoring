@@ -52,6 +52,16 @@ namespace DataAccessLibrary.DataAccessLayer.DataAccess
             }
         }
 
+        public async Task<int> InsertRow<U>(string query, U parameters, string connectionStringName)
+        {
+            string ConnectionString = GetConnectionString(connectionStringName);
+
+            using (IDbConnection connection = new NpgsqlConnection(ConnectionString))
+            {
+                return await connection.ExecuteAsync(query, parameters, commandType: CommandType.Text);
+            }
+        }
+
         public void InsertSp<U>(string sp, List<U> param,string cons)
         {
             string ConnectionString = GetConnectionString(cons);

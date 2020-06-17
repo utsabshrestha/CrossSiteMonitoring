@@ -2,89 +2,81 @@
 for details on configuring this project to bundle and minify static web assets. */
 
 a.navbar-brand {
-  white-space: normal;
-  text-align: center;
-  word-break: break-all;
+    white-space: normal;
+    text-align: center;
+    word-break: break-all;
 }
 
 /* Provide sufficient contrast against white background */
 a {
-  color: #0366d6;
+    color: #0366d6;
 }
 
 .btn-primary {
-  color: #fff;
-  background-color: #1b6ec2;
-  border-color: #1861ac;
+    color: #fff;
+    background-color: #1b6ec2;
+    border-color: #1861ac;
 }
 
 .nav-pills .nav-link.active, .nav-pills .show > .nav-link {
-  color: #fff;
-  background-color: #1b6ec2;
-  border-color: #1861ac;
+    color: #fff;
+    background-color: #1b6ec2;
+    border-color: #1861ac;
 }
 
 /* Sticky footer styles
 -------------------------------------------------- */
 html {
-  font-size: 14px;
+    font-size: 14px;
 }
+
 @media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
+    html {
+        font-size: 16px;
+    }
 }
 
 .border-top {
-  border-top: 1px solid #e5e5e5;
+    border-top: 1px solid #e5e5e5;
 }
+
 .border-bottom {
-  border-bottom: 1px solid #e5e5e5;
+    border-bottom: 1px solid #e5e5e5;
 }
 
 .box-shadow {
-  box-shadow: 0 .25rem .75rem rgba(0, 0, 0, .05);
+    box-shadow: 0 .25rem .75rem rgba(0, 0, 0, .05);
 }
 
 button.accept-policy {
-  font-size: 1rem;
-  line-height: inherit;
+    font-size: 1rem;
+    line-height: inherit;
 }
 
 /* Sticky footer styles
 -------------------------------------------------- */
 html {
-  position: relative;
-  min-height: 100%;
+    position: relative;
+    min-height: 100%;
 }
 
 body {
-  /* Margin bottom by footer height */
-  margin-bottom: 60px;
+    /* Margin bottom by footer height */
+    margin-bottom: 60px;
 }
+
 .footer {
-  position: absolute;
-  bottom: 0;
-  width: 100%;
-  white-space: nowrap;
-  line-height: 60px; /* Vertically center the text there */
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    white-space: nowrap;
+    line-height: 60px; /* Vertically center the text there */
 }
 
-.mainContainer{
-    margin-top: 100px;
+.mainContainer {
+    margin-top: 170px;
 }
 
-.dropdown:hover .dropdown-menu {
-    /*display: block !important;*/
-}
-
-
-
-/*@media (min-width: 1280px) {
-    .container {
-        max-width: 1250px;
-    }
-}*/
 
 @media (min-width: 1366px) {
     .container {
@@ -104,15 +96,16 @@ body {
     }
 }
 
+
 .table thead {
-    background-color: #44328d;
-    color: white;
+    background-color: #234;
+    color: #fff;
 }
 
-.table thead tr th {
-    font-weight: 300 !important;
-    font-size: 19px;
-}
+    .table thead tr th {
+        font-weight: 400 !important;
+        font-size: 17px;
+    }
 
 .page {
     padding: 20mm;
@@ -140,5 +133,181 @@ body {
 }
 
 .themeColor {
-    background-color: #44328d !important;
+    background-color: #234 !important;
 }
+
+#navshrink {
+    overflow: hidden;
+    padding: 30px 10px;
+    transition: 0.4s;
+    position: fixed;
+    width: 100%;
+    top: 0;
+    z-index: 10;
+    background-color: #234 !important;
+    height: auto;
+}
+
+    #navshrink #Logo {
+        font-size: 30px;
+        font-weight: bold;
+        transition: 0.4s;
+    }
+
+.tableHeaderFixed-bar {
+    overflow: hidden;
+    transition: 0.4s;
+    position: sticky;
+    width: 100%;
+    top: 80px;
+    z-index: 5;
+    background-color: #fff;
+    padding: 40px 0px 10px 0px;
+}
+
+
+.tableHeaderFixed-head {
+    overflow: hidden;
+    transition: 0.4s;
+    position: sticky;
+    width: 100%;
+    top: 170px;
+    z-index: 5;
+    background-color: #fff;
+}
+
+.dropdown:hover .dropdown-menu {
+    display: block !important;
+}
+
+.dropdown-menu {
+    border: 0 !important;
+    top: 31px;
+    left: -10px;
+}
+
+.dropdown-item {
+    color: #d4e9ff
+}
+
+.dropdown-item:focus, .dropdown-item:hover {
+    color: #fff;
+    text-decoration: none;
+    background-color: #234;
+}
+
+.nav-link {
+    font-size: 18px !important;
+    transition: 0.4s;
+}
+
+    .nav-link:hover {
+        color: #d4e9ff !important;
+    }
+
+
+.drpmenu {
+    background-color: #15202b;
+    width: 100%;
+    top: 40px;
+}
+
+.notifyme {
+    position: fixed;
+    top: 120px;
+    z-index: 100;
+    right: 20px;
+}
+.notifyme-in {
+    background-color: white;
+    min-width: 350px;
+}
+
+
+
+/* Style the Image Used to Trigger the Modal */
+#myImg {
+    border-radius: 5px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+    #myImg:hover {
+        opacity: 0.7;
+    }
+
+/* The Modal (background) */
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 11; /* Sit on top */
+    padding-top: 100px; /* Location of the box */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgb(0,0,0); /* Fallback color */
+    background-color: rgba(0,0,0,0.9); /* Black w/ opacity */
+}
+
+/* Modal Content (Image) */
+.modal-content {
+    margin: auto;
+    display: block;
+    width: 80%;
+    max-width: 700px;
+}
+
+/* Caption of Modal Image (Image Text) - Same Width as the Image */
+#caption {
+    margin: auto;
+    display: block;
+    width: 80%;
+    max-width: 700px;
+    text-align: center;
+    color: #ccc;
+    padding: 10px 0;
+    height: 150px;
+}
+
+/* Add Animation - Zoom in the Modal */
+.modal-content, #caption {
+    animation-name: zoom;
+    animation-duration: 0.6s;
+}
+
+@keyframes zoom {
+    from {
+        transform: scale(0)
+    }
+
+    to {
+        transform: scale(1)
+    }
+}
+
+/* The Close Button */
+.closeModal {
+    position: absolute;
+    top: 15px;
+    right: 35px;
+    color: #f1f1f1;
+    font-size: 40px;
+    font-weight: bold;
+    transition: 0.3s;
+}
+
+    .closeModal:hover,
+    .closeModal:focus {
+        color: #bbb;
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+/* 100% Image Width on Smaller Screens */
+@media only screen and (max-width: 700px) {
+    .modal-content {
+        width: 100%;
+    }
+} 

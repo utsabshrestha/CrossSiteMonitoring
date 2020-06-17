@@ -11,6 +11,7 @@ using Csm.Services.ServiceInterface;
 using Csm.Web.Models;
 using Csm.Web.ViewModels;
 using DataAccessLibrary.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -40,24 +41,24 @@ namespace Csm.Web.Controllers
         {
             var roaddetails = await inventory.GetRoads();
             var districts = await inventory.GetDistricts();
-            var districtItems = (from dis in districts select new SelectListItem  { Value = dis.district_name, Text = dis.district_name }).ToList();
+            var districtItems = (from dis in districts select new SelectListItem { Value = dis.district_name, Text = dis.district_name }).ToList();
 
-            //List<RoadList> roadlists = new List<RoadList>();
+            List<RoadList> roadlists = new List<RoadList>();
 
-            //foreach (var road in roaddetails)
-            //{
-            //    roadlists.Add(mapper.Map<RoadList>(road));
-            //}
+            foreach (var road in roaddetails)
+            {
+                roadlists.Add(mapper.Map<RoadList>(road));
+            }
 
             var model = new RoadListViewModel
             {
                 district_all = districtItems,
-                RoadList = roaddetails.ToList()
+                RoadList = roadlists
             };
 
             return View(model);
-        } 
-        
+        }
+
         [HttpPost]
         public async Task<IActionResult> ListRoads(string districtSelected)
         {
@@ -71,18 +72,18 @@ namespace Csm.Web.Controllers
 
             var districtItems = (from dis in districts select new SelectListItem { Value = dis.district_name, Text = dis.district_name }).ToList();
 
-            //List<RoadList> roadlists = new List<RoadList>();
+            List<RoadList> roadlists = new List<RoadList>();
 
-            //foreach (var road in roaddetails)
-            //{
-            //    roadlists.Add(mapper.Map<RoadList>(road));
-            //}
+            foreach (var road in roaddetails)
+            {
+                roadlists.Add(mapper.Map<RoadList>(road));
+            }
 
             var model = new RoadListViewModel
             {
                 districtSelected = districtSelected,
                 district_all = districtItems,
-                RoadList = roaddetails.ToList()
+                RoadList = roadlists
             };
 
             return View(model);
@@ -96,11 +97,11 @@ namespace Csm.Web.Controllers
 
             if (string.IsNullOrEmpty(model.district))
             {
-                 roaddetails = await inventory.GetRoadDetails(model.road_code);
+                roaddetails = await inventory.GetRoadDetails(model.road_code);
             }
             else
             {
-                 roaddetails = await inventory.GetRoadDetails(model.road_code, model.district);
+                roaddetails = await inventory.GetRoadDetails(model.road_code, model.district);
             }
 
 
@@ -109,27 +110,153 @@ namespace Csm.Web.Controllers
                 roadDetail.Add(mapper.Map<DetailRoadList>(roaddetail));
             }
 
+            ViewData["message"] = $"{this.Request.Scheme}://{this.Request.Host}{this.Request.PathBase}/Dashboard/ChangeReportStatus";
+            ViewData["district"] = model.district;
+
             return View(roadDetail);
         }
 
         [HttpPost]
-        public async Task<IActionResult> ViewReport(string road_code, DateTime date, string observer_email)
+        public async Task<IActionResult> ViewReport(string form_id, string road_code, DateTime date, string observer_email)
         {
-            IEnumerable<ReportDataModel> reportList = await inventory.GetReportDataList(road_code, date, observer_email);
-            IList<ReportModel> reportViewModel = new List<ReportModel>();
 
-            foreach(var roadData in reportList)
+            GenericReport<Inital, ConstructionObservation, Files> report =
+                await inventory.GetWholeReport<Inital, ConstructionObservation, Files>(form_id, road_code);
+
+            FullReport fullReport = new FullReport
             {
-                reportViewModel.Add(mapper.Map<ReportModel>(roadData));
+                inital = report.GetInitial,
+                constructionObservations = report.GetConstruction,
+                files = report.GetFiles
+            };
+
+            if (report.GetInitial.Any())
+            {
+                ViewData["district"] = report.GetInitial.ElementAt(0).district;
+                ViewData["road_code"] = report.GetInitial.ElementAt(0).road_code;
             }
 
-            ReportViewModel model = new ReportViewModel { ReportData = reportViewModel };
+            return View(fullReport);
+        }
 
-            return View(model);
+        [HttpPost]
+        public async Task<IActionResult> ChangeReportStatus([FromBody] SelectedeReprotData road)
+        {
+            var user = await GetCurrentUserAsync();
+
+            if (!User.IsInRole("Admin") && user?.Email != road.observer_email)
+            {
+                return Unauthorized();
+            }
+            //DateTime date = Convert.ToDateTime(road.date);
+
+            IEnumerable<Inital> InitialsDetails = await inventory.CheckReportEmail( road.form_id ,road.road_code, road.observer_email);
+
+            if (InitialsDetails.Any())
+            {
+                try
+                {
+                    var update = await inventory.UpdateReportStatus(road.form_id, road.road_code, road.observer_email);
+
+                    if (update == 1)
+                    {
+                        return Ok(new { status = 1, message = "The Report is Finalized." });
+                    }
+                    else
+                    {
+                        return BadRequest(new { status = 0, message = "Error occured while finalizing the Report." });
+                    }
+                }
+                catch (Exception)
+                {
+
+                    return BadRequest(new { status = 0, message = "Error occured while finalizing the Report." });
+                }
+
+            }
+            else
+            {
+                return NotFound(new { status = 0, message = "The Report doesn't Exist at the moment!" });
+            }
+        }
+
+        private Task<ApplicationUser> GetCurrentUserAsync() => userManager.GetUserAsync(HttpContext.User);
+
+        [HttpPost]
+        public async Task<IActionResult> EditConstructionReport(SelectedeReprotData selectedeReprotData)
+        {
+            var user = await GetCurrentUserAsync();
+
+            if (!User.IsInRole("Admin") && user?.Email != selectedeReprotData.observer_email)
+            {
+                return RedirectToAction("AccessDenied", "Account");
+            }
+
+            GenericReport<Inital, ConstructionObservation, Files> report = 
+                await inventory.GetWholeReport<Inital, ConstructionObservation, Files>(selectedeReprotData.form_id, selectedeReprotData.road_code);
+
+            FullReport fullReport = new FullReport
+            {
+                inital = report.GetInitial,
+                constructionObservations = report.GetConstruction,
+                files = report.GetFiles
+            };
+
+            if (report.GetInitial.Any())
+            {
+                ViewData["district"] = report.GetInitial.ElementAt(0).district;
+                ViewData["road_code"] = report.GetInitial.ElementAt(0).road_code;
+            }
+
+            ViewData["message"] = $"{this.Request.Scheme}://{this.Request.Host}{this.Request.PathBase}/Dashboard/UpdateInitials";
+
+            return View(fullReport);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UpdateInitials([FromBody] ConstructionDataModel constructionObservation)
+        {
+            IEnumerable<Inital> InitialsDetails = await inventory.CheckReportEmail(constructionObservation.uuid, constructionObservation.road_code, constructionObservation.observer_email);
+            var user = await GetCurrentUserAsync();
+            if (!InitialsDetails.Any())
+            {
+                return BadRequest(new { message = "The Report does not exist, cannot update." });
+            }
+
+            if (!User.IsInRole("Admin") && user.Email != InitialsDetails?.ElementAt(0).observer_email)
+            {
+                return RedirectToAction("AccessDenied", "Account");
+            }
+            ConstructionObservation param = new ConstructionObservation
+            {
+                construction_type = constructionObservation.construction_type,
+                location = constructionObservation.location,
+                observation_notes = constructionObservation.observation_notes,
+                quality_rating = constructionObservation.quality_rating,
+                form_id = constructionObservation.form_id
+            };
+
+            try
+            {
+                var status = await inventory.UpdateConstructionObservation(param);
+                if (status == 1)
+                {
+                    return Ok(new { message = "The Report has been updated." });
+                }
+                else
+                {
+                    return BadRequest(new { message = "Error Occured while updating the Report." });
+                }
+            }
+            catch (Exception e)
+            {
+                return BadRequest(new { message = "Error Occured while updating the Report." + e.Message });
+            }
+
         }
 
         [HttpGet]
-        public IActionResult test() 
+        public IActionResult test()
         {
             return Ok();
         }

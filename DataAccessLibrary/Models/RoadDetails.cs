@@ -7,6 +7,7 @@ namespace DataAccessLibrary.Models
     public class RoadDetails
     {
         public int ini_id { get; set; }
+        public string form_id { get; set; }
         public string road_code { get; set; }
         public string road_name { get; set; }
         public string district { get; set; }
