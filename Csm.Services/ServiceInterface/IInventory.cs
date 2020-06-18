@@ -18,6 +18,7 @@ namespace Csm.Services.ServiceInterface
         Task<int> UpdateReportStatus(string form_id, string roadCode, string observerEmail);
         Task<GenericReport<T, U, R>> GetWholeReport<T, U, R>(string form_id, string road_code);
         Task<int> UpdateConstructionObservation(ConstructionObservation constructionObservation);
+        Task<bool> DeleteReportObservation(string form_id, string road_code);
     }
 }
         

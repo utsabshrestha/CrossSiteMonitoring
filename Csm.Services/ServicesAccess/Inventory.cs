@@ -134,7 +134,15 @@ namespace Csm.Services.ServicesAccess
                 Email = observerEmail
             };
 
-            return await sqlDataAccess.InsertRow<dynamic>(query, parameters, "Csmdb");
+            try
+            {
+                return await sqlDataAccess.ExecuteRow<dynamic>(query, parameters, "Csmdb");
+            }
+            catch (Exception)
+            {
+                //TODO : Log this issue.
+                return 0;
+            }
         }
 
         public async Task<GenericReport<T, U, R>> GetWholeReport<T, U, R>(string form_id, string road_code)
@@ -170,7 +178,43 @@ namespace Csm.Services.ServicesAccess
                 QualityRating = constructionObservation.quality_rating,
                 FormId = constructionObservation.form_id
             };
-            return await sqlDataAccess.InsertRow<dynamic>(query, parameters, "Csmdb");
+
+            try
+            {
+                return await sqlDataAccess.ExecuteRow<dynamic>(query, parameters, "Csmdb");
+            }
+            catch (Exception)
+            {
+                //TODO : Log this issue
+                return 0;
+            }
+        }
+
+        public async Task<bool> DeleteReportObservation(string form_id, string road_code)
+        {
+            string queryInitial = @"delete from monitoring.initial_details where form_id = @FormId and road_code = @RoadCode";
+            string queryConstruction = @"delete from monitoring.construction_observation_detail where uuid = @FormId and road_code = @RoadCode";
+            string queryFile = @"delete from monitoring.file where uuid = @FormId";
+
+            var parameters = new
+            {
+                FormId = form_id,
+                RoadCode = road_code
+            };
+
+            try
+            {
+                await sqlDataAccess.ExecuteRow<dynamic>(queryInitial, parameters, "Csmdb");
+                await sqlDataAccess.ExecuteRow<dynamic>(queryConstruction, parameters, "Csmdb");
+                await sqlDataAccess.ExecuteRow<dynamic>(queryFile, parameters, "Csmdb");
+                return true;
+            }
+            catch (Exception)
+            {
+                // TODO: Log this issue;
+                return false;
+            }
+            
         }
 
     }

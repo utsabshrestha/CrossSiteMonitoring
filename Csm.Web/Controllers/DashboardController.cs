@@ -154,25 +154,16 @@ namespace Csm.Web.Controllers
 
             if (InitialsDetails.Any())
             {
-                try
-                {
-                    var update = await inventory.UpdateReportStatus(road.form_id, road.road_code, road.observer_email);
+                var update = await inventory.UpdateReportStatus(road.form_id, road.road_code, road.observer_email);
 
-                    if (update == 1)
-                    {
-                        return Ok(new { status = 1, message = "The Report is Finalized." });
-                    }
-                    else
-                    {
-                        return BadRequest(new { status = 0, message = "Error occured while finalizing the Report." });
-                    }
+                if (update == 1)
+                {
+                    return Ok(new { status = 1, message = "The Report is Finalized." });
                 }
-                catch (Exception)
+                else
                 {
-
                     return BadRequest(new { status = 0, message = "Error occured while finalizing the Report." });
                 }
-
             }
             else
             {
@@ -208,13 +199,13 @@ namespace Csm.Web.Controllers
                 ViewData["road_code"] = report.GetInitial.ElementAt(0).road_code;
             }
 
-            ViewData["message"] = $"{this.Request.Scheme}://{this.Request.Host}{this.Request.PathBase}/Dashboard/UpdateInitials";
+            ViewData["message"] = $"{this.Request.Scheme}://{this.Request.Host}{this.Request.PathBase}/Dashboard/UpdateObservations";
 
             return View(fullReport);
         }
 
         [HttpPost]
-        public async Task<IActionResult> UpdateInitials([FromBody] ConstructionDataModel constructionObservation)
+        public async Task<IActionResult> UpdateObservations([FromBody] ConstructionDataModel constructionObservation)
         {
             IEnumerable<Inital> InitialsDetails = await inventory.CheckReportEmail(constructionObservation.uuid, constructionObservation.road_code, constructionObservation.observer_email);
             var user = await GetCurrentUserAsync();
@@ -227,6 +218,7 @@ namespace Csm.Web.Controllers
             {
                 return RedirectToAction("AccessDenied", "Account");
             }
+
             ConstructionObservation param = new ConstructionObservation
             {
                 construction_type = constructionObservation.construction_type,
@@ -236,24 +228,33 @@ namespace Csm.Web.Controllers
                 form_id = constructionObservation.form_id
             };
 
-            try
+            var status = await inventory.UpdateConstructionObservation(param);
+            if (status == 1)
             {
-                var status = await inventory.UpdateConstructionObservation(param);
-                if (status == 1)
-                {
-                    return Ok(new { message = "The Report has been updated." });
-                }
-                else
-                {
-                    return BadRequest(new { message = "Error Occured while updating the Report." });
-                }
+                return Ok(new { message = "The Report has been updated." });
             }
-            catch (Exception e)
+            else
             {
-                return BadRequest(new { message = "Error Occured while updating the Report." + e.Message });
+                return BadRequest(new { message = "Error Occured while updating the Report." });
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteReport([FromBody] SelectedeReprotData selectedeReprotData)
+        {
+            var user = await GetCurrentUserAsync();
+            if (!User.IsInRole("Admin") && user?.Email != selectedeReprotData.observer_email)
+            {
+                return RedirectToAction("AccessDenied", "Account");
             }
 
-        }
+            var status = await inventory.DeleteReportObservation(selectedeReprotData.form_id, selectedeReprotData.road_code);
+            if (status)
+            {
+                return Ok(new { message = $"The Report with road code {selectedeReprotData.road_code} and date time {selectedeReprotData.date} is deleted." });
+            }
+            return BadRequest(new { message = "Error occured while deleting the Report." });
+         }
 
         [HttpGet]
         public IActionResult test()

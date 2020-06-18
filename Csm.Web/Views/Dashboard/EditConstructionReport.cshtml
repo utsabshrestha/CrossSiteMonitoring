@@ -182,12 +182,14 @@
 <script>
     let myStatus = null;
     let msg = document.getElementById("msg");
-
+    function getUrl() {
+        return '@message';
+    }
     async function Update(id, Obserno) {
         let data = document.getElementById(id);
         let formData = new FormData(data);
         let __RequestVerificationToken = formData.get("__RequestVerificationToken");
-        $('#exampleModal').modal('hide');
+        $('.toast').toast('hide');
 
         const dataJson = {};
         for (var pair of formData.entries()) {
@@ -196,7 +198,7 @@
             dataJson[pair[0]] = pair[1];
         }
         console.log(dataJson);
-        await postData('https://localhost:5001/Dashboard/UpdateInitials', dataJson, __RequestVerificationToken)
+        await postData(getUrl(), dataJson, __RequestVerificationToken)
             .then(data => {
                 if (myStatus == 200) {
                     msg.innerHTML = `Observation${Obserno} has been updated.`;

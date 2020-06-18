@@ -52,7 +52,7 @@ namespace DataAccessLibrary.DataAccessLayer.DataAccess
             }
         }
 
-        public async Task<int> InsertRow<U>(string query, U parameters, string connectionStringName)
+        public async Task<int> ExecuteRow<U>(string query, U parameters, string connectionStringName)
         {
             string ConnectionString = GetConnectionString(connectionStringName);
 

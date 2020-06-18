@@ -44,6 +44,7 @@ namespace Csm.Web.ViewModels
         [Display(Name = "In Maintenance")]
         public int in_maintenance { get; set; }
         public DateTime date { get; set; }
+        [Display(Name = "Status *Inactive user cannot Login.")]
         public string status { get; set; }
 
         public List<SelectListItem> district_all { get; set; }
