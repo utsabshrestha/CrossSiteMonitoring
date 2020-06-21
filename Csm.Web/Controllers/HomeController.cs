@@ -13,14 +13,16 @@ namespace Csm.Web.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
+        private readonly ILogger<HomeController> logger;
+
         //private readonly RoleManager<ApplicationUser> _roleManager;
         //private readonly UserManager<ApplicationUser> _userManager;
         //, RoleManager<ApplicationUser> roleManager, UserManager<ApplicationUser> userManager
-        
+
         public HomeController(ILogger<HomeController> logger)
         {
-            _logger = logger;
+            this.logger = logger;
+
             //this._roleManager = roleManager;
             //this._userManager = userManager;
         }
@@ -33,13 +35,14 @@ namespace Csm.Web.Controllers
         [Authorize]
         public IActionResult Value()
         {
+            //logger.LogInformation("view me in data");
             return Ok(new { message = "Uello Utsab"});
         }
         
         [Authorize]
         public IActionResult Privacy()
         {
-            throw new Exception("Error in Privacy");
+            //throw new Exception("Error in Privacy");
             // async Task<IActionResult>
             //string[] roles = { "Admin", "Developer", "Client" };
 

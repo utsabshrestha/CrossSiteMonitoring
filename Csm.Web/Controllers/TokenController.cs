@@ -11,6 +11,7 @@ using Csm.Web.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis.Options;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -32,17 +33,37 @@ namespace Csm.Web.Controllers
             this.settings = options.Value;
         }
 
-        [HttpPost]
-        public async Task<IActionResult> Create(string username, string password)
+        [HttpGet]
+        public IEnumerable<string> Get()
         {
-            if (await IsValidUsernamePassword(username, password))
+            return new string[] { "Give me sunshine.", "Give me some rain." };
+        }
+
+        //TODO: Some Insights.
+        //Some Insights.
+        //FromForm can only recieve form-data not json and
+        //FromBody can only recieve Json data not form-data.
+        //if Json is sent to FromForm the parameters recieved will be null
+        //and if form-data is sent to FromBody then the Request will be rejected with 
+        //status code 415 Unsupported Media Type
+        //***
+        //Swagger won't work if the controller don't have the http attributes.
+
+        [HttpPost]
+        public async Task<IActionResult> Create([FromBody] TokenCred tokenCred)
+        {
+            if (tokenCred.username != null && tokenCred.password != null && ModelState.IsValid)
             {
-                return new ObjectResult(await GenerateToken(username));
+                if (await IsValidUsernamePassword(tokenCred.username, tokenCred.password))
+                {
+                    return new ObjectResult(await GenerateToken(tokenCred.username));
+                }
+                else
+                {
+                    return BadRequest(new { message = "Username or password is incorrect" });
+                }
             }
-            else
-            {
-                return BadRequest(new { message = "Username or password is incorrect"});
-            }
+            return BadRequest(new { message = "Pleas provide correct information to retrieve the Token." });
         }
 
         private async Task<bool> IsValidUsernamePassword(string username, string password)

@@ -36,7 +36,6 @@ namespace Csm.Web.Controllers
             this.syncApi = syncApi;
         }
 
-
         [HttpGet]
         public async Task<IActionResult> ListRoads()
         {
@@ -44,12 +43,7 @@ namespace Csm.Web.Controllers
             var districts = await inventory.GetDistricts();
             var districtItems = (from dis in districts select new SelectListItem { Value = dis.district_name, Text = dis.district_name }).ToList();
 
-            List<RoadList> roadlists = new List<RoadList>();
-
-            foreach (var road in roaddetails)
-            {
-                roadlists.Add(mapper.Map<RoadList>(road));
-            }
+            var roadlists = mapper.Map<IEnumerable<Road>, IEnumerable<RoadList>>(roaddetails);
 
             var model = new RoadListViewModel
             {
@@ -73,12 +67,7 @@ namespace Csm.Web.Controllers
 
             var districtItems = (from dis in districts select new SelectListItem { Value = dis.district_name, Text = dis.district_name }).ToList();
 
-            List<RoadList> roadlists = new List<RoadList>();
-
-            foreach (var road in roaddetails)
-            {
-                roadlists.Add(mapper.Map<RoadList>(road));
-            }
+            var roadlists = mapper.Map<IEnumerable<Road>, IEnumerable<RoadList>>(roaddetails);
 
             var model = new RoadListViewModel
             {
@@ -93,7 +82,6 @@ namespace Csm.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> ListRoadDetail(RoadList model)
         {
-            List<DetailRoadList> roadDetail = new List<DetailRoadList>();
             IEnumerable<RoadDetails> roaddetails = null;
 
             if (string.IsNullOrEmpty(model.district))
@@ -105,13 +93,10 @@ namespace Csm.Web.Controllers
                 roaddetails = await inventory.GetRoadDetails(model.road_code, model.district);
             }
 
-
-            foreach (var roaddetail in roaddetails)
-            {
-                roadDetail.Add(mapper.Map<DetailRoadList>(roaddetail));
-            }
+            var roadDetail = mapper.Map<IEnumerable<RoadDetails>, IEnumerable<DetailRoadList>>(roaddetails);
 
             ViewData["message"] = $"{this.Request.Scheme}://{this.Request.Host}{this.Request.PathBase}/Dashboard/ChangeReportStatus";
+            ViewData["message2"] = $"{this.Request.Scheme}://{this.Request.Host}{this.Request.PathBase}/Dashboard/DeleteReport";
             ViewData["district"] = model.district;
 
             return View(roadDetail);

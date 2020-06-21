@@ -35,7 +35,7 @@
             </tr>
         </thead>
         <tbody>
-            @for (int i = 0; i < Model.RoadList.Count; i++)
+            @*@for (int i = 0; i < Model.RoadList.Count; i++)
             {
                 <tr>
                     <th scope="row">@sn</th>
@@ -52,7 +52,27 @@
                     </td>
                 </tr>
                 sn++;
+            }*@
+
+            @foreach (var road in Model.RoadList)
+            {
+                <tr>
+                    <th scope="row">@sn</th>
+                    <td>@road.road_code</td>
+                    <td>@road.district</td>
+                    <td>@road.last_uploaded_date.ToString("dd/MM/yyyy")</td>
+                    <td>
+                        <form method="post" asp-action="ListRoadDetail">
+                            <input type="hidden" asp-for="@road.road_code" name="road_code" />
+                            <input type="hidden" asp-for="@road.last_uploaded_date" name="uploadDate" />
+                            <input type="hidden" asp-for="@road.district" name="district" />
+                            <button type="submit" class="btn btn-light">View All Visit</button>
+                        </form>
+                    </td>
+                </tr>
+                sn++;
             }
+
         </tbody>
     </table>
 </div>

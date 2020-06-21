@@ -7,6 +7,7 @@
     var i = 1;
     var user = await userManager.GetUserAsync(User);
     var message = ViewData["Message"]?.ToString() ?? null;
+    var message2 = ViewData["message2"]?.ToString() ?? null;
     var district = ViewData["district"]?.ToString() ?? null;
 }
 
@@ -213,10 +214,15 @@ else
 
 
 <script>
+
     function getUrl()
     {
         return "@message";
     }
+    function getUrl2() {
+        return "@message2";
+    }
+
 </script>
 @section Scripts{
     <script src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>

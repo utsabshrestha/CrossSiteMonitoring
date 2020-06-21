@@ -14,7 +14,8 @@ namespace Csm.Web.ViewModels
             district_all = new List<SelectListItem>();
             RoadList = new List<RoadList>();
         }
-        public IList<RoadList> RoadList { get; set; }
+
+        public IEnumerable<RoadList> RoadList { get; set; }
         public List<SelectListItem> district_all { get; set; }
         public string districtSelected { get; set; }
     }

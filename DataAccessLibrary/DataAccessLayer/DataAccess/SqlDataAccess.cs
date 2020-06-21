@@ -2,6 +2,7 @@
 using DataAccessLibrary.DataAccessLayer.Interfaces;
 using DataAccessLibrary.DataHelper;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Npgsql;
 using System;
@@ -19,9 +20,12 @@ namespace DataAccessLibrary.DataAccessLayer.DataAccess
         private IDbTransaction _transaction;
         private bool isClosed = false;
         private CsmData settings;
-        public SqlDataAccess(IOptions<CsmData> options)
+        private readonly ILogger<SqlDataAccess> logger;
+
+        public SqlDataAccess(IOptions<CsmData> options, ILogger<SqlDataAccess> logger)
         {
             settings = options.Value;
+            this.logger = logger;
         }
 
         public string GetConnectionString(String ConnectionStringName)
@@ -117,9 +121,10 @@ namespace DataAccessLibrary.DataAccessLayer.DataAccess
                 {
                     CommintTransaction();
                 }
-                catch
+                catch (Exception e)
                 {
                     // TODO: Log this issue
+                    logger.LogError(e, "Error occured with Message {message}", e.Message);
                 }
             }
 

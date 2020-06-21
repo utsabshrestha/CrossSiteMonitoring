@@ -68,7 +68,7 @@ namespace Csm.Web
                 .AddRazorRuntimeCompilation();
 
             //CSRF Global Filter.
-            services.AddMvc(options => options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute()));
+            //services.AddMvc(options => options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute()));
 
             // configure strongly typed settings objects
             services.Configure<CsmSettings>(options => Configuration.GetSection("CsmSettings").Bind(options)); //for DI in TokenGenerator.
@@ -125,7 +125,7 @@ namespace Csm.Web
             else
             {
                 app.UseExceptionHandler("/Error"); // In Production when error occured display error page From Error Controller.
-                app.UseStatusCodePagesWithReExecute("/Error/{0}"); //For undefined Url like foo/bar.
+                app.UseStatusCodePagesWithReExecute("/Error/{0}"); //For undefined Url like foo/bar?email=abc@mail.com.
 
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();

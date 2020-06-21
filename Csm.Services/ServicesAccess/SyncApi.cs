@@ -11,6 +11,7 @@ using DataAccessLibrary.DataAccessLayer.Interfaces;
 using System.Linq;
 using System.Net;
 using System.Data;
+using Microsoft.Extensions.Logging;
 
 namespace Csm.Services.ServicesAccess
 {
@@ -19,14 +20,16 @@ namespace Csm.Services.ServicesAccess
         private readonly IWebHostEnvironment webHostEnvironment;
         private readonly ISqlDataAccess sqlDataAccess;
         private readonly ISqlLiteDataAccess sqlLiteDataAccess;
+        private readonly ILogger<SyncApi> logger;
         private SyncStatus status;
         public string SqlLitePath { get; set; }
 
-        public SyncApi(IWebHostEnvironment webHostEnvironment, ISqlDataAccess sqlDataAccess, ISqlLiteDataAccess sqlLiteDataAccess)
+        public SyncApi(IWebHostEnvironment webHostEnvironment, ISqlDataAccess sqlDataAccess, ISqlLiteDataAccess sqlLiteDataAccess, ILogger<SyncApi> logger)
         {
             this.webHostEnvironment = webHostEnvironment;
             this.sqlDataAccess = sqlDataAccess;
             this.sqlLiteDataAccess = sqlLiteDataAccess;
+            this.logger = logger;
             status = new SyncStatus();
         }
 
@@ -90,6 +93,7 @@ namespace Csm.Services.ServicesAccess
             {
                 sqlDataAccess.RollbackTransaction();
                 status.Message = e.Message.ToString();
+                logger.LogError(e, "{Message}", e.Message);
                 return false;
             }
         }
@@ -276,6 +280,7 @@ namespace Csm.Services.ServicesAccess
             catch (Exception e)
             {
                 status.Message = e.Message.ToString();
+                logger.LogError(e, "{Message}", e.Message);
                 return false;
             }
         }
@@ -443,21 +448,25 @@ namespace Csm.Services.ServicesAccess
             catch (UnauthorizedAccessException e)
             {
                 status.Message = e.Message.ToString();
+                logger.LogError(e, "{Message}", e.Message);
                 return false;
             }
             catch (FileNotFoundException e)
             {
                 status.Message = e.Message.ToString();
+                logger.LogError(e, "{Message}", e.Message);
                 return false;
             }
             catch (IOException e)
             {
                 status.Message = e.Message.ToString();
+                logger.LogError(e, "{Message}", e.Message);
                 return false;
             }
             catch (Exception e)
             {
                 status.Message = e.Message.ToString();
+                logger.LogError(e, "{Message}", e.Message);
                 return false;
             }
         }

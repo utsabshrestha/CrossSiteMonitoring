@@ -153,9 +153,9 @@ function ReportFinalize() {
                 continue;
             dataJson[pair[0]] = pair[1];
         }
-
+        let url = getUrl2();
         console.log(dataJson);
-        postData("https://localhost:5001/Dashboard/DeleteReport", dataJson, __RequestVerificationToken)
+        postData(url, dataJson, __RequestVerificationToken)
             .then(data => {
                 if (myStatus == 200) {
                     msg.innerHTML = data.message;
