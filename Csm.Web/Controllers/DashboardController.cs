@@ -5,6 +5,7 @@ using System.Dynamic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using AutoMapper;
 using Csm.Services.ServiceInterface;
@@ -257,8 +258,13 @@ namespace Csm.Web.Controllers
          }
 
         [HttpGet]
-        public IActionResult test()
+        public async Task<IActionResult> test()
         {
+            var LoggedInUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var userName = User.FindFirstValue(ClaimTypes.Name); // will give the user's userName
+            var applicationUser = await userManager.GetUserAsync(User);
+
+            //var LoggedInUser = 
             return Ok();
         }
     }

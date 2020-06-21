@@ -39,6 +39,7 @@ namespace Csm.Web.Controllers
         [Authorize]
         public IActionResult Privacy()
         {
+            throw new Exception("Error in Privacy");
             // async Task<IActionResult>
             //string[] roles = { "Admin", "Developer", "Client" };
 

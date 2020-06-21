@@ -41,6 +41,7 @@ namespace Csm.Web
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            //Version of PgSql requried for the Identity to work.
             services.AddDbContextPool<ApplicationDbContext>(options => options.UseNpgsql(Configuration.GetConnectionString("Csmdb"),
             options => options.SetPostgresVersion(new Version(9, 6))));
 
@@ -51,7 +52,7 @@ namespace Csm.Web
                 options.Password.RequiredUniqueChars = 2;
                 options.User.RequireUniqueEmail = true;
             })
-                .AddEntityFrameworkStores<ApplicationDbContext>();
+            .AddEntityFrameworkStores<ApplicationDbContext>();
 
             //DI services and dal
             services.AddTransient<IInventory, Inventory>();
@@ -70,12 +71,13 @@ namespace Csm.Web
             services.AddMvc(options => options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute()));
 
             // configure strongly typed settings objects
-            services.Configure<CsmSettings>(options => Configuration.GetSection("CsmSettings").Bind(options));
-            var csmSettings = Configuration.GetSection("CsmSettings").Get<CsmSettings>();
+            services.Configure<CsmSettings>(options => Configuration.GetSection("CsmSettings").Bind(options)); //for DI in TokenGenerator.
+            var csmSettings = Configuration.GetSection("CsmSettings").Get<CsmSettings>(); //for Jwt Auth Middleware.
+
             // connection string 
             services.Configure<CsmData>(options => Configuration.GetSection("ConnectionStrings").Bind(options));
 
-            //jtw
+            //jtw MW
             services.AddAuthentication()
                 .AddCookie(cfg => cfg.SlidingExpiration = true)
                 .AddJwtBearer(cfg =>
@@ -121,8 +123,10 @@ namespace Csm.Web
                 app.UseDatabaseErrorPage();
             }
             else
-            { 
-                app.UseExceptionHandler("/Home/Error");
+            {
+                app.UseExceptionHandler("/Error"); // In Production when error occured display error page From Error Controller.
+                app.UseStatusCodePagesWithReExecute("/Error/{0}"); //For undefined Url like foo/bar.
+
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }

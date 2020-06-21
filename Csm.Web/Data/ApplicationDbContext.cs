@@ -20,6 +20,7 @@ namespace Csm.Web.Data
         {
             base.OnModelCreating(builder);
 
+            //If want to put the default Identiy User Tables in the default schema use this line.
             //builder.HasDefaultSchema("monitoring");
 
             //cascading off in aspuser with role for role deletion
@@ -28,7 +29,7 @@ namespace Csm.Web.Data
                 foreignKey.DeleteBehavior = DeleteBehavior.Restrict;
             }
 
-            //haha lol take a heck of trial and error to changing name for aspuser table
+            //haha lol took a heck of trial and error to changing name for aspuser table from Capital Letters to small
             builder.Entity<ApplicationUser>(
             b =>
             {
