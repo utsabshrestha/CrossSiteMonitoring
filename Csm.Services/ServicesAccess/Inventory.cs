@@ -1,6 +1,7 @@
 ﻿using Csm.Services.ServiceInterface;
 using DataAccessLibrary.DataAccessLayer.Interfaces;
 using DataAccessLibrary.Models;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,10 +12,20 @@ namespace Csm.Services.ServicesAccess
     public class Inventory : IInventory
     {
         private readonly ISqlDataAccess sqlDataAccess;
+        private readonly ILogger<Inventory> logger;
 
-        public Inventory(ISqlDataAccess sqlDataAccess)
+        public Inventory(ISqlDataAccess sqlDataAccess, ILogger<Inventory> logger)
         {
             this.sqlDataAccess = sqlDataAccess;
+            this.logger = logger;
+        }
+
+        public async Task<IEnumerable<District>> GetDistrictList(string redirect, string observer_email)
+        {
+            if(redirect == "mysites")
+                return await GetUserSpecificDistircts(observer_email);
+            else
+                return await GetDistricts();
         }
 
         public async Task<IEnumerable<District>> GetDistricts()
@@ -25,21 +36,46 @@ namespace Csm.Services.ServicesAccess
 
             return output;
         }
-
-        public async Task<IEnumerable<Road>> GetRoads()
+        private async Task<IEnumerable<District>> GetUserSpecificDistircts(string observer_email)
         {
-            string query = @"select id.road_code, id.district, max(id.uploaded_date) as last_uploaded_date 
-                            from monitoring.initial_details id
-                            join (select uuid from monitoring.construction_observation_detail group by uuid) c on c.uuid = id.form_id 
-                            join public.user_registration ur on ur.email=id.observer_email
-                            group by id.road_code,id.district order by last_uploaded_date desc;";
-
-            var output = await sqlDataAccess.LoadData<Road, dynamic>(query, new { }, "Csmdb");
-
+            string query = @"select distinct district_name,id,dcode from monitoring.tbl_district d
+                            join monitoring.initial_details id on id.district = d.district_name
+                            where id.observer_email = @ObserverEmail order by district_name asc";
+            var parameters = new
+            {
+                ObserverEmail = observer_email
+            };
+            var output = await sqlDataAccess.LoadData<District, dynamic>(query, parameters, "Csmdb");
             return output;
         }
 
-        public async Task<IEnumerable<Road>> GetRoads(string district)
+        public async Task<IEnumerable<Road>> GetRoadsList(string redirect, string observer_email)
+        {
+            if(redirect == "mysites")
+                return await GetUserSpecificRoads(observer_email);
+            else
+                return await GetRoads();
+        }
+        public async Task<IEnumerable<Road>> GetRoadsList(string redirect, string observer_email, string district)
+        {
+            if(redirect == "mysites")
+                return await GetUserSpecificRoads(observer_email, district);
+            else
+                return await GetRoads(district);
+        }
+
+        private async Task<IEnumerable<Road>> GetRoads()
+        {
+            string query = @"select id.road_code, max(id.district) as district, max(id.uploaded_date) as last_uploaded_date 
+                            from monitoring.initial_details id
+                            join (select uuid from monitoring.construction_observation_detail group by uuid) c on c.uuid = id.form_id 
+                            join public.user_registration ur on ur.email=id.observer_email
+                            group by id.road_code order by last_uploaded_date desc;";
+
+            var output = await sqlDataAccess.LoadData<Road, dynamic>(query, new { }, "Csmdb");
+            return output;
+        }
+        private async Task<IEnumerable<Road>> GetRoads(string district)
         {
             string query = @"select id.road_code, id.district, max(id.uploaded_date) as uploaded_date from monitoring.initial_details id
                             join (select uuid from monitoring.construction_observation_detail group by uuid) c on c.uuid = id.form_id 
@@ -48,7 +84,37 @@ namespace Csm.Services.ServicesAccess
                             group by id.road_code,id.district order by uploaded_date desc;";
 
             var output = await sqlDataAccess.LoadData<Road, dynamic>(query, new { District = district }, "Csmdb");
-
+            return output;
+        }
+        private async Task<IEnumerable<Road>> GetUserSpecificRoads(string observer_email)
+        {
+            string query = @"select id.road_code, id.district, max(id.uploaded_date) as last_uploaded_date 
+                            from monitoring.initial_details id
+                            join (select uuid from monitoring.construction_observation_detail group by uuid) c on c.uuid = id.form_id 
+                            join public.user_registration ur on ur.email=id.observer_email
+                            where id.observer_email = @ObserverEmail
+                            group by id.road_code,id.district order by last_uploaded_date desc;";
+            var parameters = new
+            {
+                ObserverEmail = observer_email
+            };
+            var output = await sqlDataAccess.LoadData<Road, dynamic>(query, parameters, "Csmdb");
+            return output;
+        }
+        private async Task<IEnumerable<Road>> GetUserSpecificRoads(string observer_email, string district)
+        {
+            string query = @"select id.road_code, id.district, max(id.uploaded_date) as last_uploaded_date 
+                            from monitoring.initial_details id
+                            join (select uuid from monitoring.construction_observation_detail group by uuid) c on c.uuid = id.form_id 
+                            join public.user_registration ur on ur.email=id.observer_email
+                            where id.observer_email = @ObserverEmail and id.district = @District
+                            group by id.road_code,id.district order by last_uploaded_date desc;";
+            var parameters = new
+            {
+                ObserverEmail = observer_email,
+                District = district
+            };
+            var output = await sqlDataAccess.LoadData<Road, dynamic>(query, parameters, "Csmdb");
             return output;
         }
 
@@ -74,16 +140,13 @@ namespace Csm.Services.ServicesAccess
                             left join monitoring.file f on f.form_id=cod.form_id
                             join public.user_registration ur on ur.email=id.observer_email
                             where id.road_code = @RoadCode and id.district = @District order by id.ini_id DESC;";
-
             var parameters = new
             {
                 RoadCode = roadCode,
                 District = district
             };
-
             var output = await sqlDataAccess.LoadData<RoadDetails, dynamic>(query, parameters, "Csmdb");
             return output;
-
         }
 
         public async Task<IEnumerable<ReportDataModel>> GetReportDataList(string form_id, string roadeCode, string observerEmail)
@@ -133,19 +196,20 @@ namespace Csm.Services.ServicesAccess
                 RoadCode = roadCode,
                 Email = observerEmail
             };
-
             try
             {
                 return await sqlDataAccess.ExecuteRow<dynamic>(query, parameters, "Csmdb");
             }
-            catch (Exception)
+            catch (Exception e)
             {
                 //TODO : Log this issue.
+                logger.LogError(e, "Error during Finalizing Report form_id {id} by {user}", form_id, observerEmail);
                 return 0;
             }
         }
 
         public async Task<GenericReport<T, U, R>> GetWholeReport<T, U, R>(string form_id, string road_code)
+            where T : Inital where U : ConstructionObservation where R : Files
         {
             string queryInitial = "select * from monitoring.initial_details where form_id = @FormId and road_code = @RoadCode order by ini_id asc";
             string queryConstrunction = "select * from monitoring.construction_observation_detail where uuid = @FormId order by cons_id asc";
@@ -156,6 +220,7 @@ namespace Csm.Services.ServicesAccess
                 FormId = form_id,
                 RoadCode = road_code
             };
+
             GenericReport<T, U, R> report = new GenericReport<T, U, R>
             {
                 GetInitial = await sqlDataAccess.LoadData<T, dynamic>(queryInitial, parameters, "Csmdb"),
@@ -183,9 +248,10 @@ namespace Csm.Services.ServicesAccess
             {
                 return await sqlDataAccess.ExecuteRow<dynamic>(query, parameters, "Csmdb");
             }
-            catch (Exception)
+            catch (Exception e)
             {
                 //TODO : Log this issue
+                logger.LogError(e, "Error occured while editing construction report of formId = {id}", constructionObservation.form_id);
                 return 0;
             }
         }
@@ -209,13 +275,17 @@ namespace Csm.Services.ServicesAccess
                 await sqlDataAccess.ExecuteRow<dynamic>(queryFile, parameters, "Csmdb");
                 return true;
             }
-            catch (Exception)
+            catch (Exception e)
             {
                 // TODO: Log this issue;
+                logger.LogError(e, "Error occured while deleting report of formId = {id}", form_id);
                 return false;
             }
             
         }
+
+
+
 
     }
 }

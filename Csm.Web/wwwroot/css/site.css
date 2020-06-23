@@ -149,8 +149,8 @@ body {
 }
 
     #navshrink #Logo {
-        font-size: 30px;
-        font-weight: bold;
+        font-size: 29px;
+        font-weight: 400;
         transition: 0.4s;
     }
 
@@ -197,13 +197,14 @@ body {
 }
 
 .nav-link {
-    font-size: 18px !important;
+    font-size: 17px !important;
+    font-weight: 400;
     transition: 0.4s;
 }
 
-    .nav-link:hover {
-        color: #d4e9ff !important;
-    }
+.nav-link:hover {
+    color: #d4e9ff !important;
+}
 
 
 .drpmenu {

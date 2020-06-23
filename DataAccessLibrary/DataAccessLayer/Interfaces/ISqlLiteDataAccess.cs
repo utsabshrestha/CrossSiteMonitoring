@@ -8,8 +8,6 @@ namespace DataAccessLibrary.DataAccessLayer.Interfaces
 {
     public interface ISqlLiteDataAccess
     {
-        void Dispose();
-
         string GetConnectionString(string ConnectionStringName);
 
         Task<IEnumerable<T>> LoadSqLiteData<T, U>(string queries, U parameter, string PathSqlite);

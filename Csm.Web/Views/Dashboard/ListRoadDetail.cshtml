@@ -9,6 +9,7 @@
     var message = ViewData["Message"]?.ToString() ?? null;
     var message2 = ViewData["message2"]?.ToString() ?? null;
     var district = ViewData["district"]?.ToString() ?? null;
+    var redirections = ViewData["Redirection"]?.ToString();
 }
 
 
@@ -20,7 +21,7 @@
     <div class="mb-3">
         <div class="row">
             <div class="col-md-auto">
-                <form asp-action="ListRoads" method="post">
+                <form asp-action="ListRoads" method="post" asp-route-redirect="@redirections">
                     <input asp-for="@district" name="districtSelected" type="hidden" />
                     <button type="submit" class="btn btn-lg" style="font-weight:500; color: #0366d6">Go Back to @district District</button>
                 </form>
@@ -148,16 +149,16 @@ else
                             <div class="dropdown-menu drpmenu" aria-labelledby="navbarDropdown">
                                 <h6 class="dropdown-header">Manage Reports</h6>
 
-                                @if ((User.IsInRole("Admin") || user.Email == road.observer_email) && road.report_status == 0)
+                                @if ((User.IsInRole("Admin") || user?.Email == road.observer_email) && road.report_status == 0)
                                 {
                                     <form method="post" id="@road.form_id">
                                         <a href="javascript:void(0);" data-toggle="modal" data-target="#exampleModal" id="@road.ini_id" class="btn dropdown-item" onclick="Finalize('@road.form_id','@road.road_code','@road.date','@road.observer_email','@road.road_name','@road.ini_id')">Finalize</a>
                                     </form>
                                 }
 
-                                @if (user.Email == road.observer_email || User.IsInRole("Admin") || road.report_status == 1)
+                                @if (user?.Email == road.observer_email || User.IsInRole("Admin") || road.report_status == 1)
                                 {
-                                    <form asp-action="ViewReport" method="post" class="dropdown-item">
+                                    <form asp-action="ViewReport" method="post" class="dropdown-item" asp-route-redirect="@redirections">
                                         <input value="@road.form_id" name="form_id" type="hidden" />
                                         <input value="@road.road_code" name="road_code" type="hidden" />
                                         <input value="@road.date" name="date" type="hidden" />
@@ -170,11 +171,11 @@ else
                                     <a class="dropdown-item" href="#" type="button">Not Finalize</a>
                                 }
 
-                                @if (user.Email == road.observer_email || User.IsInRole("Admin"))
+                                @if (user?.Email == road.observer_email || User.IsInRole("Admin"))
                                 {
                                     if (road.report_status == 0)
                                     {
-                                        <form asp-action="EditConstructionReport" method="post" class="dropdown-item">
+                                        <form asp-action="EditConstructionReport" method="post" class="dropdown-item" asp-route-redirect="@redirections">
                                             <input value="@road.form_id" name="form_id" type="hidden" />
                                             <input value="@road.road_code" name="road_code" type="hidden" />
                                             <input value="@road.date" name="date" type="hidden" />

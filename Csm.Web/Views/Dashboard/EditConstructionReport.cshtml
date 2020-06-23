@@ -3,10 +3,11 @@
 
 @{
     ViewBag.Title = "Report Edit Page";
-    var district = ViewData["district"]?.ToString() ?? null;
-    var road_code = ViewData["road_code"]?.ToString() ?? null;
+    var district = ViewData["district"]?.ToString();
+    var road_code = ViewData["road_code"]?.ToString();
     var initial = Model.inital.Any() ? Model.inital.ElementAt(0) : null;
-    var message = ViewData["message"]?.ToString() ?? null;
+    var message = ViewData["message"]?.ToString();
+    var redirections = ViewData["Redirection"]?.ToString();
 }
 
 @* For the Notification*@
@@ -31,14 +32,14 @@
         <div class="row">
             <div class="col-md-2 pt-5">
                 <div class="list-group list-group-flush sticky-top" style="top: 90px;z-index: 5">
-                    <form method="post" class="mb-2 list-group-item">
+                    <form asp-action="ListRoadDetail" method="post" class="mb-2 list-group-item" asp-route-redirect="@redirections">
                         <input asp-for="@road_code" name="road_code" type="hidden" />
                         <input asp-for="@district" name="district" type="hidden" />
-                        <button asp-action="ListRoadDetail" type="submit" class="btn btn-sm styleMy">Go Back</button>
+                        <button type="submit" class="btn btn-sm styleMy">Go Back</button>
                     </form>
-                    <form method="post" class="mb-2 list-group-item">
+                    <form asp-action="ListRoads" method="post" class="mb-2 list-group-item" asp-route-redirect="@redirections">
                         <input asp-for="@district" name="districtSelected" type="hidden" />
-                        <button asp-action="ListRoads" type="submit" class="btn btn-sm styleMy">Site Visit <br />  @district</button>
+                        <button type="submit" class="btn btn-sm styleMy">Site Visit <br />  @district</button>
                     </form>
                 </div>
             </div>

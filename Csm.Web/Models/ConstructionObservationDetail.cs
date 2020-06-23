@@ -9,8 +9,7 @@ namespace Csm.Web.Models
 {
     public class ConstructionObservationDetail
     {
-        [Key]
-        public int cons_id { get; set; }
+        public string uuid { get; set; }
         public string form_id { get; set; }
         public string construction_type { get; set; }
         public string location { get; set; }
@@ -20,7 +19,6 @@ namespace Csm.Web.Models
         public double longitude { get; set; }
         public double altitude { get; set; }
         public DateTime date { get; set; }
-        public int initials_id { get; set; }
         public string road_code { get; set; }
         public string location_type { get; set; }
         public double line_latitude_from { get; set; }

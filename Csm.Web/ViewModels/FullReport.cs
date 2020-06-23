@@ -1,4 +1,5 @@
-﻿using DataAccessLibrary.Models;
+﻿using Csm.Web.Models;
+using DataAccessLibrary.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,12 +11,12 @@ namespace Csm.Web.ViewModels
     {
         public FullReport()
         {
-            inital = new List<Inital>();
-            constructionObservations = new List<ConstructionObservation>();
-            files = new List<Files>();
+            inital = new List<InitialsDetails>();
+            constructionObservations = new List<ConstructionObservationDetail>();
+            files = new List<FilesDetails>();
         }
-        public IEnumerable<Inital> inital { get; set; }
-        public IEnumerable<ConstructionObservation> constructionObservations { get; set; }
-        public IEnumerable<Files> files { get; set; }
+        public IEnumerable<InitialsDetails> inital { get; set; }
+        public IEnumerable<ConstructionObservationDetail> constructionObservations { get; set; }
+        public IEnumerable<FilesDetails> files { get; set; }
     }
 }

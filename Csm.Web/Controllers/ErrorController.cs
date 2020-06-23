@@ -25,16 +25,18 @@ namespace Csm.Web.Controllers
             var statusCodeResult = HttpContext.Features.Get<IStatusCodeReExecuteFeature>();
             var queryString = statusCodeResult?.OriginalQueryString;
             var path = statusCodeResult?.OriginalPath;
+
             if(statusCodeResult != null)
             {
                 switch (statusCode)
                 {
                     case 404:
-                        ViewBag.ErrorMessage = "Sorry, the resource you requested could not be found.";
                         logger.LogWarning("404 Error Occured. Path = {Path} and QueryString= {QueryString}", path, queryString);
                         break;
                 }
             }
+
+            ViewBag.ErrorMessage = "Sorry, the resource you requested could not be found.";
             return View("NotFound");
         }
 

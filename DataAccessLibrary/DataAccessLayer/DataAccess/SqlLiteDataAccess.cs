@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace DataAccessLibrary.DataAccessLayer.DataAccess
 {
-    public class SqlLiteDataAccess : IDisposable, ISqlLiteDataAccess
+    public class SqlLiteDataAccess : ISqlLiteDataAccess
     {
         private readonly ILogger<SqlLiteDataAccess> logger;
 
@@ -56,6 +56,7 @@ namespace DataAccessLibrary.DataAccessLayer.DataAccess
                     connection.Open();
                     using SQLiteDataAdapter adapter = new SQLiteDataAdapter(queries, connection);
                     adapter.Fill(dataTable);
+                    connection.Close();
                     return dataTable;
                 }
             }
@@ -64,11 +65,6 @@ namespace DataAccessLibrary.DataAccessLayer.DataAccess
                 logger.LogError(e, e.Message);
                 throw;
             }
-        }
-
-        public void Dispose()
-        {
-           
         }
     }
 }

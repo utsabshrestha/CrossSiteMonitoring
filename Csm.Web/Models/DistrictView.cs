@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Csm.Web.Models
 {
-    public class District
+    public class DistrictView
     {
         public int id { get; set; }
         public string district_name { get; set; }

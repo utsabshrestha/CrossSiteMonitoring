@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Csm.Services.ServiceInterface;
+using Microsoft.Extensions.Logging;
 
 namespace Csm.Web.Controllers
 {
@@ -22,12 +23,16 @@ namespace Csm.Web.Controllers
         private readonly RoleManager<IdentityRole> roleManager;
         private readonly UserManager<ApplicationUser> userManager;
         private readonly IInventory inventory;
+        private readonly ILogger<AdministrationController> logger;
 
-        public AdministrationController(RoleManager<IdentityRole> roleManager, UserManager<ApplicationUser> userManager, IInventory inventory)
+        public AdministrationController(RoleManager<IdentityRole> roleManager, UserManager<ApplicationUser> userManager, 
+            IInventory inventory,
+            ILogger<AdministrationController> logger)
         {
             this.roleManager = roleManager;
             this.userManager = userManager;
             this.inventory = inventory;
+            this.logger = logger;
         }
         
         [HttpGet]
@@ -64,7 +69,7 @@ namespace Csm.Web.Controllers
 
                 return View("ListUsers");
             }
-        }    
+        }  
         
         [HttpPost]
         public async Task<IActionResult> DeleteRole(string id)
@@ -350,6 +355,11 @@ namespace Csm.Web.Controllers
             for(int i = 0; i < model.Count; i++)
             {
                 var user = await userManager.FindByIdAsync(model[i].UserId);
+
+                if (user == null)
+                {
+                    continue;
+                }
 
                 IdentityResult result = null;
                 

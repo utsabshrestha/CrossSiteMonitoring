@@ -16,6 +16,9 @@ namespace Csm.Web.Extensions
             CreateMap<Road, RoadList>();
             CreateMap<RoadDetails, DetailRoadList>();
             CreateMap<ReportDataModel, ReportModel>();
+            CreateMap<Inital, InitialsDetails>();
+            CreateMap<ConstructionObservation, ConstructionObservationDetail>();
+            CreateMap<Files, FilesDetails>();
         }
     }
 }

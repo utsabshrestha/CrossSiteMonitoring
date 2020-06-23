@@ -357,7 +357,7 @@ namespace Csm.Services.ServicesAccess
 
         private string InitialQueryUpdate = @"UPDATE monitoring.initial_details SET date = @date, observer_name = @observer_name, designation =@designation 
             , form_id = @form_id, observer_email = @observer_email , road_code = @road_code , road_name =@road_name , district = @district, 
-            report_status =@report_status, uploaded_date = @uploaded_date, is_test =@is_test WHERE form_id=@form_id";
+            report_status =@report_status, is_test =@is_test WHERE form_id=@form_id";
 
         private string ConstructionUpdatePoint = @"UPDATE monitoring.construction_observation_detail SET road_code=@road_code, construction_type=@construction_type,
         location=@location, observation_notes=@observation_notes, quality_rating=@quality_rating, latitude=@latitude, longitude=@longitude, 
@@ -477,7 +477,12 @@ namespace Csm.Services.ServicesAccess
         {
             string query = @"select * from initial_details";
 
-            return await sqlLiteDataAccess.LoadSqLiteData<Inital, dynamic>(query, new { }, SqlLitePath);
+            var initial =  await sqlLiteDataAccess.LoadSqLiteData<Inital, dynamic>(query, new { }, SqlLitePath);
+            foreach(var ini in initial)
+            {
+                ini.uploaded_date = DateTime.Now;
+            }
+            return initial;
         }
 
         private async Task<IEnumerable<ConstructionObservation>> LoadConstructionObservationsDetails()

@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Linq;
+using System.Threading.Tasks;
 
-namespace DataAccessLibrary.Models
+namespace Csm.Web.Models
 {
-    public class Files
+    public class FilesDetails
     {
         public string uuid { get; set; }
         public int file_id { get; set; }

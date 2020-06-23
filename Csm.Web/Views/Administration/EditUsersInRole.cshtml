@@ -1,30 +1,60 @@
 ﻿@model List<UserRoleViewModel>
 
-@{ 
+@{
     var roleId = ViewBag.roleId;
+    var Sn = 1;
 }
 
 
-<form method="post">
-    <div class="card">
+    <form method="post" asp-action="EditUsersInRole" asp-route-roleId="@roleId">
         <div class="card-header">
             <h3>@ViewBag.roleName</h3>
             <h6>Add or remove users form this role</h6>
         </div>
-        <div class="card-body">
-            @for(int i = 0; i<Model.Count; i++){
-                   <div class="form-check m-1">
-                       <input type="hidden" asp-for="@Model[i].UserId" />
-                       <input type="hidden" asp-for="@Model[i].UserName" />
-                       <input asp-for="@Model[i].IsSelected" class="form-check-input" />
-                       <label asp-for="@Model[i].IsSelected" class="form-check-label">@Model[i].UserName</label>
-                       <label asp-for="@Model[i].IsSelected" class="form-check-label">@Model[i].ObserverName</label>
-                   </div>
-            }
-        </div>
+        <br />
+        <table id="example" class="table table-hover" style="width:100%">
+            <thead id="headTable">
+                <tr>
+                    <th scope="col">SN</th>
+                    <th scope="col">Observer Email</th>
+                    <th scope="col">Observer name</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (int i = 0; i < Model.Count; i++)
+                {
+                    <tr>
+                        <td>@Sn</td>
+                        <td>
+                            <input type="hidden" asp-for="@Model[i].UserId" />
+                            <input type="hidden" asp-for="@Model[i].UserName" />
+                            <input type="hidden" asp-for="@Model[i].ObserverName" />
+                            <input asp-for="@Model[i].IsSelected" class="form-check-input" />
+                            <label asp-for="@Model[i].IsSelected" class="form-check-label">@Model[i].UserName</label>
+                        </td>
+                        <td>@Model[i].ObserverName</td>
+                    </tr>
+                    Sn++;
+                }
+            </tbody>
+        </table>
+        <br />
         <div class="card-footer">
             <input type="submit" value="Update" class="btn btn-primary" style="width:auto" />
             <a asp-action="EditRole" asp-route-id="@roleId" class="btn btn-primary" style="width:auto">Cancel</a>
         </div>
-    </div>
-</form>
+    </form>
+
+@section Scripts{
+    <script src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.20/js/dataTables.bootstrap4.min.js"></script>
+}
+<script>
+    $(document).ready(function () {
+        $('#example').dataTable({
+            "bFilter": false,      
+            "iDisplayLength": -1,
+            "bLengthChange": false
+        });
+    });
+</script>

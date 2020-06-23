@@ -9,7 +9,6 @@ namespace Csm.Web.Models
 {
     public class InitialsDetails
     {
-        [Key]
         public int ini_id { get; set; }
         public DateTime date { get; set; }
         public string observer_name { get; set; }

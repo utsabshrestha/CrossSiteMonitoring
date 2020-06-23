@@ -52,11 +52,11 @@ window.onscroll = function () {
 
         if (document.body.scrollTop > 80 || document.documentElement.scrollTop > 80) {
             document.getElementById("navshrink").style.padding = "11px 10px";
-            document.getElementById("Logo").style.fontSize = "23px";
+            document.getElementById("Logo").style.fontSize = "25px";
             currentPaddingNav = "11px";
         } else {
             document.getElementById("navshrink").style.padding = "30px 10px";
-            document.getElementById("Logo").style.fontSize = "30px";
+            document.getElementById("Logo").style.fontSize = "29px";
             currentPaddingNav = "30px";
         }
 

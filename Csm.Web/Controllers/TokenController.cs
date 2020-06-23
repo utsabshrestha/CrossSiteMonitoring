@@ -18,7 +18,7 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace Csm.Web.Controllers
 {
-    [Route("[controller]")]
+    [Route("api/[controller]")]
     [ApiController]
     public class TokenController : ControllerBase
     {
@@ -47,6 +47,8 @@ namespace Csm.Web.Controllers
         //and if form-data is sent to FromBody then the Request will be rejected with 
         //status code 415 Unsupported Media Type
         //***
+
+        //TODO: SWAGGER ERROR FIXED.
         //Swagger won't work if the controller don't have the http attributes.
 
         [HttpPost]
