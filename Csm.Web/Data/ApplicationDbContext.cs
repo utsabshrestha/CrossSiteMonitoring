@@ -6,10 +6,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Csm.Domain.Config;
 
 namespace Csm.Web.Data
 {
-    public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
+    public class ApplicationDbContext : IdentityDbContext<ApplicationUserDomain>
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {
@@ -30,7 +31,7 @@ namespace Csm.Web.Data
             }
 
             //haha lol took a heck of trial and error to changing name for aspuser table from Capital Letters to small
-            builder.Entity<ApplicationUser>(
+            builder.Entity<ApplicationUserDomain>(
             b =>
             {
                 b.ToTable("user_registration");

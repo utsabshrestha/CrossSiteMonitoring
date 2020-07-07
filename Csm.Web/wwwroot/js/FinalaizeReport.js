@@ -2,7 +2,7 @@
 
 
 $(document).ready(function () {
-    document.getElementById("navshrink").style.width = `${screen.width - 17}px`;
+    //document.getElementById("navshrink").style.width = `${screen.width}px`;
 });
 
 

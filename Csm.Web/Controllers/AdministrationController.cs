@@ -1,18 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Threading.Tasks;
-using Csm.Web.Data;
-using Csm.Web.Models;
+﻿using Csm.Domain.Config;
+using Csm.Domain.Services;
 using Csm.Web.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using Csm.Services.ServiceInterface;
 using Microsoft.Extensions.Logging;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Csm.Web.Controllers
 {
@@ -21,18 +18,20 @@ namespace Csm.Web.Controllers
     public class AdministrationController : Controller
     {
         private readonly RoleManager<IdentityRole> roleManager;
-        private readonly UserManager<ApplicationUser> userManager;
-        private readonly IInventory inventory;
+        private readonly UserManager<ApplicationUserDomain> userManager;
         private readonly ILogger<AdministrationController> logger;
+        private readonly IEnumerable<IDashboard> dashboards;
 
-        public AdministrationController(RoleManager<IdentityRole> roleManager, UserManager<ApplicationUser> userManager, 
-            IInventory inventory,
-            ILogger<AdministrationController> logger)
+        public AdministrationController(RoleManager<IdentityRole> roleManager,
+            UserManager<ApplicationUserDomain> userManager, 
+            ILogger<AdministrationController> logger,
+            IEnumerable<IDashboard> dashboards
+            )
         {
             this.roleManager = roleManager;
             this.userManager = userManager;
-            this.inventory = inventory;
             this.logger = logger;
+            this.dashboards = dashboards;
         }
         
         [HttpGet]
@@ -137,7 +136,7 @@ namespace Csm.Web.Controllers
             // GetRolesAsync returns the list of user Roles
             var userRoles = await userManager.GetRolesAsync(user);
 
-            var getDistrict = await inventory.GetDistricts();
+            var getDistrict = await dashboards.FirstOrDefault(x => x.User == "sites").getDistrict();
 
             var district = (from dist in getDistrict
                             select new SelectListItem { Value = dist.district_name, Text = dist.district_name }).ToList();
@@ -194,7 +193,8 @@ namespace Csm.Web.Controllers
 
                 if(result.Succeeded)
                 {
-                    return RedirectToAction("ListUsers");
+                    //return RedirectToAction("ListUsers");
+                    return View(model);
                 }
 
                 foreach(var error in result.Errors)

@@ -216,15 +216,19 @@ body {
 .notifyme {
     position: fixed;
     top: 120px;
-    z-index: 100;
-    right: 20px;
+    z-index: 20;
+    right: 3%;
 }
+
 .notifyme-in {
     background-color: white;
     min-width: 350px;
 }
 
-
+/*.modal .modal-dialog{
+    margin-top: 30px !important;
+    margin-bottom: 800px !important;
+}*/
 
 /* Style the Image Used to Trigger the Modal */
 /*#myImg {

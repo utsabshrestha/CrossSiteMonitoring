@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Csm.Web.Models
 {
-    public class ApplicationUser : IdentityUser
+    public class ApplicationUser
     {
         public string observer_name { get; set; }
         public string designation { get; set; }

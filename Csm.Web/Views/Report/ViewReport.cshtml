@@ -1,0 +1,290 @@
+﻿
+@model FullReport
+
+@{
+    ViewBag.Title = "Report View Page";
+    var district = ViewData["district"]?.ToString() ?? null;
+    var road_code = ViewData["road_code"]?.ToString() ?? null;
+    var initial = Model.inital.Any() ? Model.inital.ElementAt(0) : null;
+    var redirections = ViewData["Redirection"]?.ToString();
+}
+
+@*@Context.Request.Host @Context.Request.Path @Context.Request.Scheme*@
+
+@if (Model.inital.Any())
+{
+
+    <!-- The Modal -->
+    <div id="myModal" class="modal">
+
+        <!-- The Close Button -->
+        <span class="closeModal">&times;</span>
+
+        <!-- Modal Content (The Image) -->
+        <img class="modal-content" id="ImageModal">
+
+        <!-- Modal Caption (Image Text) -->
+        <div id="caption"></div>
+    </div>
+
+
+    <div class="container">
+        <div class="row">
+            <div class="col-md-2 pt-5">
+                <div class="list-group list-group-flush sticky-top" style="top: 90px;z-index: 1">
+                    <form  asp-action="ListRoadDetail" asp-controller="Dashboard" method="post" class="mb-2 list-group-item" asp-route-redirect="@redirections">
+                        <input asp-for="@road_code" name="road_code" type="hidden" />
+                        <input asp-for="@district" name="district" type="hidden" />
+                        <input asp-for="@DateTime.Now" name="last_uploaded_date" type="hidden" />
+                        <button type="submit" class="btn btn-sm styleMy">Go Back</button>
+                    </form>
+                    <form asp-action="ListRoads" asp-controller="Dashboard" method="post" class="mb-2 list-group-item" asp-route-redirect="@redirections">
+                        <input asp-for="@district" name="districtSelected" type="hidden" />
+                        <button type="submit" class="btn btn-sm styleMy">Site Visit <br /> @district</button>
+                    </form>
+                </div>
+            </div>
+            <div class="col-md-8 page">
+                <h3 class="card-title align-items-center text-primary text-center">Construction Site Visit Report</h3>
+                <h6 class="card-subtitle text-muted text-center">@initial.road_name</h6>
+
+                <div class="row mt-5">
+                    <div class="col-sm-8">
+                        <h4 class="card-subtitle text-muted">Initial Detials</h4>
+                    </div>
+                    <div class="col-sm-4">
+                        <h6 class="card-subtitle text-muted">Date : @initial.date.ToShortDateString()</h6>
+                    </div>
+                </div>
+                <div class="dropdown-divider"></div>
+
+                <table class="table table-borderless mb-4" id="introduction">
+                    <tbody>
+                        <tr>
+                            <td class="col-sm-4 col-form-label">Observer Name </td>
+                            <td class="col-sm-8"> @initial.observer_name</td>
+                        </tr>
+                        <tr>
+                            <td class="col-sm-4 col-form-label">Observer Email</td>
+                            <td class="col-sm-8">@initial.observer_email</td>
+                        </tr>
+                        <tr>
+                            <td class="col-sm-4 col-form-label">Designation</td>
+                            <td> @initial.designation</td>
+                        </tr>
+                        <tr>
+                            <td class="col-sm-4 col-form-label">District</td>
+                            <td class="col-sm-8"> @initial.district</td>
+                        </tr>
+                        <tr>
+                            <td class="col-sm-4 col-form-label">Road Code</td>
+                            <td class="col-sm-8">@initial.road_code</td>
+                        </tr>
+                        <tr>
+                            <td class="col-sm-4 col-form-label">Road Name</td>
+                            <td class="col-sm-8">@initial.road_name</td>
+                        </tr>
+
+                    </tbody>
+                </table>
+
+
+                <br />
+                <br />
+                <h4 class="card-subtitle text-muted">Construction Observation Detials</h4>
+                <div class="dropdown-divider"></div>
+
+
+
+                @{
+                    var ObservCount = 0;
+                }
+
+                @foreach (var report in Model.constructionObservations)
+                {
+                    var ImageFileList = Model.files.Where(x => x.form_id == report.form_id && x.file_type == "Image");
+                    var VideoFileList = Model.files.Where(x => x.form_id == report.form_id && x.file_type == "Video");
+
+                    ObservCount++;
+
+                    <br />
+                    <h6 class="card-subtitle text-muted">Observation @ObservCount</h6>
+                    <br />
+
+
+                    if (!string.IsNullOrEmpty(report.form_id))
+                    {
+                        //TODO: image location not set yet for form_id.
+
+                        <img style="width: 90%" id="img-@ObservCount" class="img-fluid" alt="Responsive image" src="~/GoogleLocationImage/863664030016959_1580018976314.png" />
+                    }
+
+                    <div class="card-title mt-3 mb-3 text-muted">Map Location</div>
+
+                    <table class="table table-borderless mt-3 mb-4" id="table-num-@ObservCount">
+                        <tbody>
+                            <tr>
+                                <td class="col-sm-4 col-form-label">Construction Type</td>
+                                <td class="col-sm-8">@report.construction_type</td>
+                            </tr>
+                            <tr>
+                                <td class="col-sm-4 col-form-label">Location</td>
+                                <td class="col-sm-8">@report.location</td>
+                            </tr>
+                            <tr>
+                                <td class="col-sm-4 col-form-label">Observation Notes</td>
+                                <td class="col-sm-8">@report.observation_notes</td>
+                            </tr>
+                            <tr>
+                                <td class="col-sm-4 col-form-label">Quality Rating</td>
+                                <td class="col-sm-8">@report.quality_rating</td>
+                            </tr>
+                            <tr>
+                                <td class="col-sm-4 col-form-label">Co-ordinates Point (Lat>lon) </td>
+                                <td class="col-sm-8">@report.latitude , @report.longitude</td>
+                            </tr>
+                            <tr>
+                                <td class="col-sm-4 col-form-label">Elevation</td>
+                                <td class="col-sm-8">@report.altitude</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div style="min-height: 300px;margin-bottom: 5px">
+                        <img src="~/GoogleLocationImage/863664030016959_1580018976314.png" class="rounded float-left" alt="First Image'" width="350" id="img-first-@ObservCount" onclick="modalImage('img-first-@ObservCount')">
+                        <img src="~/GoogleLocationImage/863664030016959_1580018976314.png" class="rounded float-right" alt="Second Image'" width="350" id="img-second-@ObservCount" onclick="modalImage('img-second-@ObservCount')">
+                    </div>
+                }
+
+            </div>
+            <div class="col-md-2 pt-5">
+                <div class="list-group list-group-flush sticky-top" style="top: 90px;z-index: 1">
+                    <div class="mb-2 list-group-item">
+                        <button class="btn btn-sm styleMy" onclick="CreatePdF()">Print PDF </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    @section Scripts{
+
+        @*Sources for jspdf*@
+        @*<script src="https://unpkg.com/jspdf@1.5.3/dist/jspdf.min.js"></script>*@
+        @*<script src="https://unpkg.com/jspdf-autotable@3.5.3/dist/jspdf.plugin.autotable.js"></script>*@
+
+        <script src="~/js/jspdf.min.js"></script>
+        <script src="~/js/jspdf.plugin.autotable.js"></script>
+        <script type="text/javascript">
+
+
+
+            // Get the modal
+            let modal = document.getElementById("myModal");
+            // Get the image and insert it inside the modal - use its "alt" text as a caption
+           
+            let captionText = document.getElementById("caption");
+
+            function modalImage(id, captions)
+            {
+                let modalImg = document.getElementById("ImageModal");
+                let img = document.getElementById(id);
+                modal.style.display = "block";
+                modalImg.src = img.src;
+                captionText.innerHTML = img.alt;
+            }
+
+            let span = document.getElementsByClassName("closeModal")[0];
+
+            // When the user clicks on <span> (x), close the modal
+            span.onclick = function () {
+                modal.style.display = "none";
+            } 
+
+
+        function CreatePdF()
+        {
+            let options = {
+                orientation: 'p',
+                unit: 'mm',
+                format: 'a4',
+                putOnlyUsedFonts: true,
+                floatPrecision: 16 // or "smart", default is 16
+            };
+
+            var doc = new jsPDF(options);
+            doc.setTextColor(0, 0, 255);
+            doc.setFont("times");
+            doc.setFontStyle("normal");
+            doc.text("Construction Site Visit Report", 105, 20, null, null, "center");
+            doc.setTextColor(100);
+            doc.text("@initial.road_name", 105, 30, null, null, "center");
+            doc.autoTable({ html: "#introduction",startY: 40 });
+            let tablePos = doc.previousAutoTable.finalY;
+            let numObserv = @Model.constructionObservations.Count();
+            let curObserv = 1;
+            let temp;
+            let imgsrc;
+
+            while (curObserv <= numObserv) {
+
+                temp = "#table-num-" + curObserv;
+
+                if (curObserv == 1) {
+                    doc.text("Observation " + curObserv, 15, tablePos + 10);
+                    doc.addImage(document.getElementById("img-" + curObserv), 'PNG', 15, tablePos + 15, 180, 110);
+                    doc.autoTable({ html: temp, startY: tablePos + 140 });
+                } else {
+                    doc.text("Observation " + curObserv, 15, 20);
+                    doc.addImage(document.getElementById("img-" + curObserv), 'PNG', 15, 30, 180, 110);
+                    doc.autoTable({ html: temp, startY: 160 });
+                }
+                if (curObserv < numObserv) {
+                    doc.addPage();
+                }
+                curObserv++;
+            }
+            let fname = "@initial.road_name" + "_" + "@initial.date.Year " + "_" + "@initial.date.Month" + "_" + "@initial.date.Day";
+
+            doc.save( fname + '.pdf');
+        }
+
+        //not used
+        async function LoadImageUri(url) {
+            let promise = new Promise((resolve) => {
+                let img = new Image();
+                img.onload = () => resolve(img);
+                img.src = url;
+            });
+            let result = await promise;
+            return result;
+        }
+
+        //not used
+        function getDataUri(url, callback) {
+            var image = new Image();
+
+            image.onload = function () {
+                var canvas = document.createElement('canvas');
+                canvas.width = this.naturalWidth; // or 'width' if you want a special/scaled size
+                canvas.height = this.naturalHeight; // or 'height' if you want a special/scaled size
+
+                canvas.getContext('2d').drawImage(this, 0, 0);
+
+                // Get raw image data
+                callback(canvas.toDataURL('image/png').replace(/^data:image\/(png|jpg);base64,/, ''));
+
+                // ... or get as Data URI
+                //callback(canvas.toDataURL('image/png'));
+            };
+
+            image.src = url;
+        }
+
+        </script>
+
+    }
+
+}

@@ -1,31 +1,26 @@
-using System;
-using System.IO;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.EntityFrameworkCore;
+using AutoMapper;
+using Csm.Domain.Config;
+using Csm.Domain.Services;
+using Csm.Domain.SynchronizeApi.Service;
+using Csm.Dto.Entities;
 using Csm.Web.Data;
+using Csm.Web.Extensions;
+using CSM.Dal.Helper;
+using CSM.Dal.Internal;
+using CSM.Dal.Repositories;
+using CSM.Dal.UnitOfWork;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using System.Text;
-using Csm.Web.Models;
-using AutoMapper;
-using DataAccessLibrary.DataAccessLayer.DataAccess;
-using Csm.Services.ServiceInterface;
-using Csm.Services.ServicesAccess;
-using DataAccessLibrary.DataAccessLayer.Interfaces;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using Csm.Web.Extensions;
-using DataAccessLibrary.DataHelper;
-using Swashbuckle.Application;
-using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Text;
 
 namespace Csm.Web
 {
@@ -46,7 +41,7 @@ namespace Csm.Web
             options => options.SetPostgresVersion(new Version(9, 6))));
 
             //Identity Api password defination
-            services.AddIdentity<ApplicationUser, IdentityRole>(options =>
+            services.AddIdentity<ApplicationUserDomain, IdentityRole>(options =>
             {
                 options.Password.RequiredLength = 8;
                 options.Password.RequiredUniqueChars = 2;
@@ -54,14 +49,38 @@ namespace Csm.Web
             })
             .AddEntityFrameworkStores<ApplicationDbContext>();
 
-            //DI services and dal
-            services.AddTransient<IInventory, Inventory>();
-            services.AddTransient<ISqlDataAccess, SqlDataAccess>();
-            services.AddTransient<ISqlLiteDataAccess, SqlLiteDataAccess>();
-            services.AddTransient<ISyncApi, SyncApi>();
+            //for identity service httpcontext in domain library.
+            services.AddHttpContextAccessor();
 
-            //AutoMapper
-            services.AddAutoMapper(typeof(Startup));
+            //DI services and dal
+
+            //services.AddTransient<IInventory, Inventory>();
+            //services.AddTransient<ISqlDataAccess, SqlDataAccess>();
+            //services.AddTransient<ISqlLiteDataAccess, SqlLiteDataAccess>();
+            //services.AddTransient<ISyncApi, SyncApi>();
+
+            services.AddTransient<IDashboard, DashboardSites>();
+            services.AddTransient<IDashboard, DashBoardUser>();
+            services.AddTransient<IReportQuery, ReportQuery>();
+            services.AddTransient<IReportServices, ReportServices>();
+            services.AddTransient<IMonitoringRepository, MonitoringRepository>();
+            services.AddTransient<IDataAccess, DataAccess>();
+            services.AddTransient<IUnitOfWork, UnitOfWork>();
+
+            services.AddTransient<ISqliteDataAccess, SqliteDataAccess>();
+            services.AddTransient<ISyncronizeService, SyncronizeService>();
+            services.AddTransient<ICreateFile, CreateFile>();
+            services.AddTransient<IDataInsertion, DataInsertion>();
+            services.AddTransient<IImageExtractor, ImageExtractor>();
+            services.AddTransient<IReadSqliteData, ReadSqliteData>();
+            services.AddTransient<ISynchronizer, Synchronizer>();
+            services.AddTransient<IReadSqlite, ReadSqlite>();
+
+            services.AddScoped<ISqlitePath, SqlitePath>();
+
+
+            //AutoMapper not used now
+            //services.AddAutoMapper(typeof(Startup));
 
             services.AddControllersWithViews();
             services.AddRazorPages()
@@ -77,7 +96,7 @@ namespace Csm.Web
             // connection string 
             services.Configure<CsmData>(options => Configuration.GetSection("ConnectionStrings").Bind(options));
 
-            //jtw MW
+            //jtw Injection
             services.AddAuthentication()
                 .AddCookie(cfg => cfg.SlidingExpiration = true)
                 .AddJwtBearer(cfg =>
@@ -100,7 +119,7 @@ namespace Csm.Web
                        "v1",
                        new OpenApiInfo
                        {
-                           Title = "Cross Site Monitoring API",
+                           Title = "Construction Site Monitoring API",
                            Version = "v1"
                        });
                setup.AddSecurityDefinition("bearer", new OpenApiSecurityScheme
@@ -114,7 +133,7 @@ namespace Csm.Web
            });
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+        // Middleware: This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
@@ -130,11 +149,10 @@ namespace Csm.Web
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
-            app.UseHttpsRedirection();
+
+            //app.UseHttpsRedirection();
             app.UseStaticFiles();
-
             app.UseRouting();
-
             app.UseAuthentication();
             app.UseAuthorization();
 

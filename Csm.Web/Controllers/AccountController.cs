@@ -1,32 +1,35 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Dynamic;
-using System.Linq;
-using System.Threading.Tasks;
-using Csm.Web.Data;
+﻿using Csm.Domain.Config;
+using Csm.Domain.Services;
 using Csm.Web.Models;
 using Csm.Web.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Csm.Services.ServiceInterface;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Csm.Web.Controllers
 {
     public class AccountController : Controller
     {
-        private readonly UserManager<ApplicationUser> userManager;
-        private readonly SignInManager<ApplicationUser> signInManager;
-        private readonly IInventory inventory;
+        private readonly UserManager<ApplicationUserDomain> userManager;
+        private readonly SignInManager<ApplicationUserDomain> signInManager;
+        private readonly IEnumerable<IDashboard> dashboards;
 
         public object AcountRegisterViewModel { get; private set; }
 
-        public AccountController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IInventory inventory)
+        public AccountController(
+            UserManager<ApplicationUserDomain> userManager,
+            SignInManager<ApplicationUserDomain> signInManager,
+            IEnumerable<IDashboard> dashboards
+            )
         {
             this.userManager = userManager;
             this.signInManager = signInManager;
-            this.inventory = inventory;
+            this.dashboards = dashboards;
         }
 
         [HttpPost]
@@ -41,7 +44,8 @@ namespace Csm.Web.Controllers
         //[Authorize]
         public async Task<IActionResult> Register()
         {
-            var getDistrict = await inventory.GetDistricts();
+
+            var getDistrict = await dashboards.FirstOrDefault(x => x.User == "sites").getDistrict();
 
             var district = (from dist in getDistrict
                             select new SelectListItem
@@ -70,7 +74,7 @@ namespace Csm.Web.Controllers
 
             if (ModelState.IsValid)
             {
-                var user = new ApplicationUser
+                var user = new ApplicationUserDomain
                 {
                     UserName = model.user_name,
                     observer_name = model.observer_name,
@@ -100,7 +104,7 @@ namespace Csm.Web.Controllers
                 }
             }
 
-            var getDistrict = await inventory.GetDistricts();
+            var getDistrict = await dashboards.FirstOrDefault(x => x.User == "sites").getDistrict();
 
             ViewModel.district_all = (from dist in getDistrict
                                       select new SelectListItem

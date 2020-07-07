@@ -24,11 +24,13 @@
     <Compile Remove="Migrations\20200318092047_RegistrationUserEdit.Designer.cs" />
     <Compile Remove="Migrations\20200318092211_UserRegEdit.cs" />
     <Compile Remove="Migrations\20200318092211_UserRegEdit.Designer.cs" />
+    <Compile Remove="Models\ConstructionObservationDetail.cs" />
+    <Compile Remove="Models\FilesDetails.cs" />
+    <Compile Remove="Models\InitialsDetails.cs" />
   </ItemGroup>
 
 
   <ItemGroup>
-    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="7.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="3.1.5" />
     <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="3.1.5" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="3.1.5" />
@@ -54,13 +56,14 @@
 
 
   <ItemGroup>
-    <Folder Include="wwwroot\AppImages\" />
-    <Folder Include="wwwroot\Mapping\" />
+    <Folder Include="wwwroot\CsmImages\" />
+    <Folder Include="wwwroot\GoogleLocationImage\" />
     <Folder Include="wwwroot\sqlFiles\" />
   </ItemGroup>
 
 
   <ItemGroup>
-    <ProjectReference Include="..\Csm.Services\Csm.Services.csproj" />
+    <ProjectReference Include="..\Csm.Domain\Csm.Domain.csproj" />
+    <ProjectReference Include="..\Csm.Dto\Csm.Dto.csproj" />
   </ItemGroup>
 </Project>

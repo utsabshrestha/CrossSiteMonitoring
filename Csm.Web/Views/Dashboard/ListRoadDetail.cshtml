@@ -1,6 +1,6 @@
-﻿@inject UserManager<ApplicationUser> userManager;
+﻿@inject UserManager<ApplicationUserDomain> userManager;
 
-@model IEnumerable<DetailRoadList>
+@model IEnumerable<RoadDetailsDto>
 
 @{
     ViewBag.Title = "Construction Site Monitoring Dashboard";
@@ -158,7 +158,7 @@ else
 
                                 @if (user?.Email == road.observer_email || User.IsInRole("Admin") || road.report_status == 1)
                                 {
-                                    <form asp-action="ViewReport" method="post" class="dropdown-item" asp-route-redirect="@redirections">
+                                    <form asp-action="ViewReport" asp-controller="Report" method="post" class="dropdown-item" asp-route-redirect="@redirections">
                                         <input value="@road.form_id" name="form_id" type="hidden" />
                                         <input value="@road.road_code" name="road_code" type="hidden" />
                                         <input value="@road.date" name="date" type="hidden" />
@@ -175,7 +175,7 @@ else
                                 {
                                     if (road.report_status == 0)
                                     {
-                                        <form asp-action="EditConstructionReport" method="post" class="dropdown-item" asp-route-redirect="@redirections">
+                                        <form asp-action="EditConstructionReport" asp-controller="Report" method="post" class="dropdown-item" asp-route-redirect="@redirections">
                                             <input value="@road.form_id" name="form_id" type="hidden" />
                                             <input value="@road.road_code" name="road_code" type="hidden" />
                                             <input value="@road.date" name="date" type="hidden" />

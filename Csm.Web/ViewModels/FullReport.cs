@@ -1,9 +1,5 @@
-﻿using Csm.Web.Models;
-using DataAccessLibrary.Models;
-using System;
+﻿using Csm.Dto.Entities;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Csm.Web.ViewModels
 {
@@ -13,10 +9,10 @@ namespace Csm.Web.ViewModels
         {
             inital = new List<InitialsDetails>();
             constructionObservations = new List<ConstructionObservationDetail>();
-            files = new List<FilesDetails>();
+            files = new List<FilesDetail>();
         }
         public IEnumerable<InitialsDetails> inital { get; set; }
         public IEnumerable<ConstructionObservationDetail> constructionObservations { get; set; }
-        public IEnumerable<FilesDetails> files { get; set; }
+        public IEnumerable<FilesDetail> files { get; set; }
     }
 }

@@ -1,17 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Csm.Services.ServiceInterface;
-using Csm.Services.ServicesAccess;
+﻿using Csm.Domain.SynchronizeApi.Service;
+using Csm.Dto.Entities;
 using Csm.Web.Extensions;
-using Csm.Web.Models;
-using DataAccessLibrary.Models;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Csm.Web.Controllers
 {
@@ -20,15 +13,11 @@ namespace Csm.Web.Controllers
     [Authorize(AuthenticationSchemes = CsmJwtConstants.AuthSchemes)]
     public class SyncController : ControllerBase
     {
-        private readonly UserManager<ApplicationUser> userManager;
-        private readonly SignInManager<ApplicationUser> signInManager;
-        private readonly ISyncApi syncApi;
+        private readonly ISyncronizeService syncronizeService;
 
-        public SyncController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, ISyncApi syncApi)
+        public SyncController(ISyncronizeService syncronizeService)
         {
-            this.userManager = userManager;
-            this.signInManager = signInManager;
-            this.syncApi = syncApi;
+            this.syncronizeService = syncronizeService;
         }
 
         // GET: api/Sync
@@ -47,24 +36,17 @@ namespace Csm.Web.Controllers
 
         // POST: api/Sync
         [HttpPost]
-        public async Task<IActionResult> Post([FromForm] SyncApiCred apiCred)
+        public async Task<IActionResult> Post([FromForm] SyncApiCred syncApiCred)
         {
             if (ModelState.IsValid)
             {
-                var process = await syncApi.SyncData(apiCred);
-                if(process.getstatus == SyncStatus.stat.Success)
-                {
-                    return Ok( new { status = process.getstatus.ToString(), statusCode = process.getstatus, message = process.Message});
-                }
-                return BadRequest(new { status = process.getstatus.ToString(), statusCode = process.getstatus, message = process.Message });
+                var Synced = await syncronizeService.Syncronize(syncApiCred);
+                if (Synced)
+                    return Ok(); //retun 200
+                else
+                    return StatusCode(500);
             }
-            return BadRequest(new { status = "Error", message = "Not sufficient information.", statusCode = 0 });
-        }
-
-        private async Task<bool> IsValidUsernameAndPassword(string username, string password)
-        {
-            var user = await userManager.FindByNameAsync(username) ?? await userManager.FindByEmailAsync(username);
-            return await userManager.CheckPasswordAsync(user, password);
+            return BadRequest(new { message = "Not sufficient information.", statusCode = 0 }); // return 400
         }
     }
 }

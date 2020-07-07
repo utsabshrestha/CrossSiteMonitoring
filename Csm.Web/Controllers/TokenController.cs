@@ -5,9 +5,11 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using Csm.Domain.Config;
 using Csm.Web.Data;
 using Csm.Web.Extensions;
 using Csm.Web.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis.Options;
@@ -23,10 +25,10 @@ namespace Csm.Web.Controllers
     public class TokenController : ControllerBase
     {
         private readonly ApplicationDbContext context;
-        private readonly UserManager<ApplicationUser> userManager;
+        private readonly UserManager<ApplicationUserDomain> userManager;
         private readonly CsmSettings settings;
 
-        public TokenController(ApplicationDbContext context, UserManager<ApplicationUser> userManager, IOptions<CsmSettings> options)
+        public TokenController(ApplicationDbContext context, UserManager<ApplicationUserDomain> userManager, IOptions<CsmSettings> options)
         {
             this.context = context;
             this.userManager = userManager;
@@ -39,20 +41,8 @@ namespace Csm.Web.Controllers
             return new string[] { "Give me sunshine.", "Give me some rain." };
         }
 
-        //TODO: Some Insights.
-        //Some Insights.
-        //FromForm can only recieve form-data not json and
-        //FromBody can only recieve Json data not form-data.
-        //if Json is sent to FromForm the parameters recieved will be null
-        //and if form-data is sent to FromBody then the Request will be rejected with 
-        //status code 415 Unsupported Media Type
-        //***
-
-        //TODO: SWAGGER ERROR FIXED.
-        //Swagger won't work if the controller don't have the http attributes.
-
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] TokenCred tokenCred)
+        public async Task<IActionResult> Post(TokenCred tokenCred)
         {
             if (tokenCred.username != null && tokenCred.password != null && ModelState.IsValid)
             {
@@ -71,7 +61,10 @@ namespace Csm.Web.Controllers
         private async Task<bool> IsValidUsernamePassword(string username, string password)
         {
             var user = await userManager.FindByEmailAsync(username) ?? await userManager.FindByNameAsync(username);
-            return await userManager.CheckPasswordAsync(user, password);
+            if (await userManager.CheckPasswordAsync(user, password) && user.status == true)
+                return true;
+            else
+                return false;
         }
 
         private async Task<dynamic> GenerateToken(string username)
@@ -122,3 +115,16 @@ namespace Csm.Web.Controllers
         }
     }
 }
+
+
+//TODO: Some Insights.
+//Some Insights.
+//FromForm can only recieve form-data not json and
+//FromBody can only recieve Json data not form-data.
+//if Json is sent to FromForm the parameters recieved will be null
+//and if form-data is sent to FromBody then the Request will be rejected with 
+//status code 415 Unsupported Media Type
+//***
+
+//TODO: SWAGGER ERROR FIXED.
+//Swagger won't work if the controller don't have the http attributes.

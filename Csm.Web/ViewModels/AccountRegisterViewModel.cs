@@ -1,4 +1,5 @@
-﻿using Csm.Web.Models;
+﻿using Csm.Domain.Config;
+using Csm.Web.Models;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System;
 using System.Collections.Generic;
@@ -13,11 +14,11 @@ namespace Csm.Web.ViewModels
         {
             UserRegistration = new UserRegistration();
             district_all = new List<SelectListItem>();
-            User = new List<ApplicationUser>();
+            User = new List<ApplicationUserDomain>();
         }
         public string PageTitle { get; set; }
         public List<SelectListItem> district_all { get; set; }
-        public IEnumerable<ApplicationUser> User { get; set; }
+        public IEnumerable<ApplicationUserDomain> User { get; set; }
         public UserRegistration UserRegistration { get; set; }
     }
 }
