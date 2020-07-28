@@ -28,7 +28,7 @@ namespace DataAccessLibrary.DataAccessLayer.DataAccess
             this.logger = logger;
         }
 
-        public string GetConnectionString(String ConnectionStringName)
+        private string GetConnectionString(String ConnectionStringName)
         {
             return settings.Csmdb;
         }
@@ -123,7 +123,7 @@ namespace DataAccessLibrary.DataAccessLayer.DataAccess
                 }
                 catch (Exception e)
                 {
-                    // TODO: Log this issue
+                    // TODO: Log this issue -Completed!
                     logger.LogError(e, "Error occured with Message {message}", e.Message);
                 }
             }

@@ -202,7 +202,7 @@ namespace Csm.Services.ServicesAccess
             }
             catch (Exception e)
             {
-                //TODO : Log this issue.
+                //TODO : Log this issue.-Completed!
                 logger.LogError(e, "Error during Finalizing Report form_id {id} by {user}", form_id, observerEmail);
                 return 0;
             }
@@ -250,7 +250,7 @@ namespace Csm.Services.ServicesAccess
             }
             catch (Exception e)
             {
-                //TODO : Log this issue
+                //TODO : Log this issue -Completed!
                 logger.LogError(e, "Error occured while editing construction report of formId = {id}", constructionObservation.form_id);
                 return 0;
             }
@@ -277,7 +277,7 @@ namespace Csm.Services.ServicesAccess
             }
             catch (Exception e)
             {
-                // TODO: Log this issue;
+                // TODO: Log this issue -Completed!
                 logger.LogError(e, "Error occured while deleting report of formId = {id}", form_id);
                 return false;
             }

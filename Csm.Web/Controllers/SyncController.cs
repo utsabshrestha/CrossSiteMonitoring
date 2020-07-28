@@ -11,6 +11,7 @@ namespace Csm.Web.Controllers
     [Route("api/[controller]")]
     [ApiController]
     [Authorize(AuthenticationSchemes = CsmJwtConstants.AuthSchemes)]
+    [IgnoreAntiforgeryToken(Order = 1001)] //ignore csrf validation
     public class SyncController : ControllerBase
     {
         private readonly ISyncronizeService syncronizeService;

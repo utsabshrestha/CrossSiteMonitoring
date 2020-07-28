@@ -21,13 +21,11 @@ function makeNavBarFixed() {
 //modal-backdrop
 
 $('#exampleModal2').click(function () {
-    console.log("clicked");
     if (isFixed)
         makeNavBarFixed()
 });
 
 $('#exampleModal').click(function () {
-    console.log("clicked");
     if (isFixed)
         makeNavBarFixed()
 });
@@ -35,7 +33,6 @@ $('#exampleModal').click(function () {
 let myStatus;
 // Example POST method implementation:
 async function postData(url = '', data = {}, RqVeTkn) {
-    console.log(data);
 
     // Default options are marked with *
     const response = await fetch(url, {
@@ -56,7 +53,7 @@ async function postData(url = '', data = {}, RqVeTkn) {
     return response.json(); // parses JSON response into native JavaScript objects
 }
 
-let RoadInfo = {
+const RoadInfo = {
     "form_id": null,
     "road_name": null,
     "road_code": null,
@@ -78,7 +75,7 @@ function Finalize(form_id, road_code, date, observer_email, road_name, id) {
     RoadInfo.id = id;
 }
 
-let msg = document.getElementById("msg");
+const msg = document.getElementById("msg");
 
 function clearRoadInfo() {
     Object.keys(RoadInfo).forEach(function (key) {
@@ -107,7 +104,6 @@ function ReportFinalize() {
                 "observer_email": RoadInfo.observer_email
             }, __RequestVerificationToken
         ).then(data => {
-            console.log(data);
             msg.innerHTML = data.message;
             if (myStatus == 200) {
                 status.innerHTML = "Final Report";
@@ -154,7 +150,6 @@ function ReportFinalize() {
             dataJson[pair[0]] = pair[1];
         }
         let url = getUrl2();
-        console.log(dataJson);
         postData(url, dataJson, __RequestVerificationToken)
             .then(data => {
                 if (myStatus == 200) {

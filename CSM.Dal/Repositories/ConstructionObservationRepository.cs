@@ -23,7 +23,7 @@ namespace CSM.Dal.Repositories
                         (@uuid, @form_id, @construction_type, @location, @observation_notes, @quality_rating, @latitude,@longitude,@altitude,@date,@road_code,@location_type,
                         ST_SetSRID(ST_MakePoint(@longitude,@latitude),4326))";
 
-            await Connection.ExecuteScalarAsync<string>(sql, constructionObservation, transaction: Transaction);
+            await Connection.ExecuteAsync(sql, constructionObservation, transaction: Transaction);
         }
 
         public async Task AddLine(IEnumerable<ConstructionObservation> constructionObservation)

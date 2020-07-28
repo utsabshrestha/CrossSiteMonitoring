@@ -8,7 +8,6 @@ namespace DataAccessLibrary.DataAccessLayer.Interfaces
     public interface ISqlDataAccess
     {
         void Dispose();
-        string GetConnectionString(string ConnectionStringName);
         Task<IEnumerable<T>> LoadData<T, U>(string queries, U parameters, string ConnectionStringName);
         IList<T> LoadDataFrmSP<T, U>(string storedProcedure, U parameters, string connectionStringName);
         void InsertSp<U>(string sp, List<U> param, string cons);

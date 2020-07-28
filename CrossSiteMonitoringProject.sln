@@ -11,9 +11,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Csm.Services", "Csm.Service
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CSM.Dal", "CSM.Dal\CSM.Dal.csproj", "{7C1E0ED0-CE91-456E-BDCB-26E0C6E72A87}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Csm.Domain", "Csm.Domain\Csm.Domain.csproj", "{23C9C781-9502-4658-8A1C-D3F01059F2CC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Csm.Domain", "Csm.Domain\Csm.Domain.csproj", "{23C9C781-9502-4658-8A1C-D3F01059F2CC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Csm.Dto", "Csm.Dto\Csm.Dto.csproj", "{1C764A10-1E33-4D10-86EF-13B3CBEEC39C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Csm.Dto", "Csm.Dto\Csm.Dto.csproj", "{1C764A10-1E33-4D10-86EF-13B3CBEEC39C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

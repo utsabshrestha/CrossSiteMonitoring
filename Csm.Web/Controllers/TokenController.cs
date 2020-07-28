@@ -22,6 +22,7 @@ namespace Csm.Web.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [IgnoreAntiforgeryToken(Order = 1001)] //ignore csrf validation
     public class TokenController : ControllerBase
     {
         private readonly ApplicationDbContext context;

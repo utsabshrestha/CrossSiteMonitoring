@@ -95,6 +95,12 @@ namespace Csm.Web.Controllers
         }
 
         [HttpGet]
+        public IActionResult MeetJitsi()
+        {
+            return View();
+        }
+
+        [HttpGet]
         public async Task<IActionResult> test()
         {
             var LoggedInUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);

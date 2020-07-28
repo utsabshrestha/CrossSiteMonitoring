@@ -53,12 +53,6 @@ namespace Csm.Web
             services.AddHttpContextAccessor();
 
             //DI services and dal
-
-            //services.AddTransient<IInventory, Inventory>();
-            //services.AddTransient<ISqlDataAccess, SqlDataAccess>();
-            //services.AddTransient<ISqlLiteDataAccess, SqlLiteDataAccess>();
-            //services.AddTransient<ISyncApi, SyncApi>();
-
             services.AddTransient<IDashboard, DashboardSites>();
             services.AddTransient<IDashboard, DashBoardUser>();
             services.AddTransient<IReportQuery, ReportQuery>();
@@ -66,7 +60,6 @@ namespace Csm.Web
             services.AddTransient<IMonitoringRepository, MonitoringRepository>();
             services.AddTransient<IDataAccess, DataAccess>();
             services.AddTransient<IUnitOfWork, UnitOfWork>();
-
             services.AddTransient<ISqliteDataAccess, SqliteDataAccess>();
             services.AddTransient<ISyncronizeService, SyncronizeService>();
             services.AddTransient<ICreateFile, CreateFile>();
@@ -75,7 +68,6 @@ namespace Csm.Web
             services.AddTransient<IReadSqliteData, ReadSqliteData>();
             services.AddTransient<ISynchronizer, Synchronizer>();
             services.AddTransient<IReadSqlite, ReadSqlite>();
-
             services.AddScoped<ISqlitePath, SqlitePath>();
 
 
@@ -87,7 +79,7 @@ namespace Csm.Web
                 .AddRazorRuntimeCompilation();
 
             //CSRF Global Filter.
-            //services.AddMvc(options => options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute()));
+            services.AddMvc(options => options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute()));
 
             // configure strongly typed settings objects
             services.Configure<CsmSettings>(options => Configuration.GetSection("CsmSettings").Bind(options)); //for DI in TokenGenerator.

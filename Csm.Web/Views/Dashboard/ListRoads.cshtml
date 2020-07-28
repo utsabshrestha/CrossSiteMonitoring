@@ -27,6 +27,7 @@
 
 @if (Model.RoadList.Any())
 {
+    string dateOnly = "";
     <div id="TableBox">
         <table id="example" class="table table-hover" style="width:100%">
             <thead id="headTable">
@@ -41,11 +42,12 @@
             <tbody>
                 @foreach (var road in Model.RoadList)
                 {
+                    dateOnly = road.last_uploaded_date.ToString("dd-mm-yyyy");
                     <tr>
                         <th scope="row">@sn</th>
                         <td>@road.road_code</td>
                         <td>@road.district</td>
-                        <td>@road.last_uploaded_date.Date</td>
+                        <td>@dateOnly</td>
                         <td>
                             <form method="post" asp-action="ListRoadDetail" asp-route-districtStatus="@districtStatus" asp-route-redirect="@redirections">
                                 <input type="hidden" asp-for="@road.road_code" name="road_code" />

@@ -1,0 +1,21 @@
+﻿@*@page
+@model Csm.Web.Views.Dashboard.MeetJitsiModel
+@{
+}*@
+
+<div id="meet"></div>
+
+    <script src="https://meet.localhost.local/external_api.js"></script>
+    <script>
+        let width = screen.width;
+        let height = screen.height;
+            var domain = "meet.localhost.local";
+            var options = {
+                roomName: "softwelname",
+                width: width,
+                height: height,
+                parentNode: document.querySelector('#meet'),
+     
+            }
+            var api = new JitsiMeetExternalAPI(domain, options);
+    </script>
