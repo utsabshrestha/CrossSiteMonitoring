@@ -3,19 +3,52 @@
 @{
 }*@
 
+
+<div class="flex-container" id="welcomepage">
+    <span class="text-center" style="font-size: 60px;color: DodgerBlue">Welcom to Softwel Meet</span>
+    <span class="text-center" style="font-size: 20px;color: DodgerBlue;">Please enter a name for your conference.</span>
+
+    <input id="confName" type="text" class="form-control m-3" style="width: 400px;" placeholder="CONFERENCE NAME">
+    <button type="button" class="btn btn-primary" style="width: 200px;" onclick="joinConf()">Enter</button>
+</div>
 <div id="meet"></div>
 
-    <script src="https://meet.localhost.local/external_api.js"></script>
+
+    <script src="https://meet.jit.si/external_api.js"></script>
     <script>
+        document.getElementById("navshrink").style.padding = "11px 10px";
+        document.getElementById("Logo").style.fontSize = "25px";
         let width = screen.width;
         let height = screen.height;
-            var domain = "meet.localhost.local";
-            var options = {
-                roomName: "softwelname",
+        var domain = "meet.jit.si";
+        var api = null;
+        var options = null;
+        function joinConf()
+        {
+            document.getElementById("welcomepage").style.display = "none";
+            let confName = document.getElementById("confName").value;
+            if (confName === "")
+                confName = "Softwel-meet";
+            options = {
+                roomName: confName,
                 width: width,
                 height: height,
                 parentNode: document.querySelector('#meet'),
      
             }
-            var api = new JitsiMeetExternalAPI(domain, options);
+            call();
+        }
+        function call(){
+            api = new JitsiMeetExternalAPI(domain, options);
+             
+           api.addEventListener("readyToClose", () => {
+            document.getElementById("welcomepage").style.display = "";
+               api.dispose();
+           });
+        }
+        function endApi(){
+            if (api)
+                api.dispose();
+        }
+           
     </script>
